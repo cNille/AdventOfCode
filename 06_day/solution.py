@@ -12,7 +12,7 @@ while True:
         exit()
         
     states.append(str(banks))
-    print(str(banks))
+    #print(str(banks))
 
     idx = banks.index(max(banks))
     value = banks[idx]

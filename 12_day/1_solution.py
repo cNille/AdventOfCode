@@ -1,4 +1,6 @@
 from collections import Counter
+from random import shuffle
+
 
 data = open('my.input').read().split('\n')
 
@@ -24,6 +26,7 @@ noMerge = True
 while noMerge:
     print('Group length', len(groups))
     noMerge = mergeGroup(groups)
+    shuffle(groups)
                 
 print(groups)
 print('Programs in same group as 0:', len(groups[0]))

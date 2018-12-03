@@ -28,6 +28,7 @@ for row in content:
     for row2 in content:
         diff = 0
         diff_index = 0
+
         for i in range(len(row)):
             if row[i] != row2[i]:
                 diff +=1
@@ -37,3 +38,12 @@ for row in content:
             print('Diff', row, row2)
             print('Diff-index', diff_index)
             print('common', row[:diff_index] + row[1+diff_index:])
+
+
+
+        # Prettier solution
+        z = zip(row, row2)
+        common = [x[0] for x in z if x[0] == x[1]]
+        if len(z) - len(common) == 1:
+            print('Solution', ''.join(common))
+            print('Diff found')

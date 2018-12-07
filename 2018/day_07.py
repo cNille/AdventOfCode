@@ -44,17 +44,19 @@ def part1():
                 conditions[c].remove(curr)
             if len(conditions[c]) == 0:
                 wip.append(c)
-                conditions[c] = [-1]
+                conditions[c] = [-1] # nullify its conditions.
 
         # Breaking condition
         if len(wip) == 0:
             steps.append(curr)
             break
 
-        wip = sorted(wip, reverse=True)
-
+        # Add current to steps
         if curr not in steps:
             steps.append(curr)
+
+        # Re-sort WIP and take the last element as current
+        wip = sorted(wip, reverse=True)
         curr = wip.pop()
 
     print('Part 1: Result is %s' % ''.join(steps))
@@ -102,5 +104,5 @@ def part2():
             break
         i += 1
 
-# part1()
-part2()
+part1()
+# part2()

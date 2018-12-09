@@ -15,9 +15,7 @@ for claim in content:
     height = int(height)
     max_width = max(left+width, max_width)
     max_height = max(top+height, max_height)
-print(max_width, max_height)
-
-matrix = np.zeros((1000,1000))
+matrix = np.zeros((max_width+1,max_height+1))
 
 # Add each inch for every claim
 for claim in content:
@@ -57,4 +55,4 @@ for claim in content:
             if matrix[x+left,y+top] > 1:
                 no_overlap = False
     if no_overlap:
-        print(c[0])
+        print('Claim:', c[0])

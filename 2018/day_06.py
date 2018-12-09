@@ -2,23 +2,6 @@ import datetime
 import operator
 import re
 
-# For diffing datetimes in seconds
-epoch = datetime.datetime.utcfromtimestamp(0)
-def unix_time_millis(dt):
-    return (dt - epoch).total_seconds()
-def date_from_format(d, f):
-    return datetime.datetime.strptime(d, f)
-def datetime_str(d):
-    return date_from_format(d, '%Y-%m-%d %H:%M')
-
-# Sorting
-def sort_dic_by_keys(d):
-    return sorted(d.items(), key=operator.itemgetter(0))
-def sort_dic_by_values(d):
-    return sorted(d.items(), key=operator.itemgetter(1))
-
-# -----------------------------------------------------------------------------
-
 # Import data
 data = [x.strip() for x in open('day_06_input.txt','r').readlines()]
 points = [x.split(', ') for x in data]
@@ -31,11 +14,15 @@ max_y = max(y)
 min_x = min(x)
 min_y = min(y)
 
+# Plot on graph
 # import matplotlib.pyplot as plt
 # plt.scatter(x, y)
 # plt.title("Scatter Plot")
 # plt.show()
 # exit()
+
+def sort_dic_by_values(d):
+    return sorted(d.items(), key=operator.itemgetter(1))
 
 def distance(p,x,y):
     return abs(x - p[0]) + abs(y - p[1])
@@ -81,5 +68,5 @@ for p in areas:
     if areas[p] is not None:
         l[p] = len(areas[p])
 
-print('Part A: Winning area:',sort_dic_by_values(l)[-1])
-print('Part B, amount within range:',within_range)
+print('Part A: Winning area:', sort_dic_by_values(l)[-1])
+print('Part B, amount within range:', within_range)

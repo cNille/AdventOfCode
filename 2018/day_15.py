@@ -214,7 +214,7 @@ def solution(data, verbose, elf_power, no_kill=False):
         if end_game:
             break
 
-        # sleep(0.2)
+        sleep(0.2)
         rounds += 1
         if verbose:
             print('Round %d' % rounds)
@@ -263,7 +263,7 @@ def solution(data, verbose, elf_power, no_kill=False):
 #     print('Should be 35 * 793 = 27755')
 
 
-verbose = False
+verbose = True
 data = open('day_15_input.txt','r').readlines()
 res = solution(data, verbose, 3)
 print('part 1:', res)

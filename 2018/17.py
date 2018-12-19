@@ -3,7 +3,7 @@ from collections import defaultdict
 from time import sleep
 
 # Import data
-data = [l.strip() for l in open('16.in', 'r').readlines()]
+data = [l.strip() for l in open('17.in', 'r').readlines()]
 
 clay = {}
 
@@ -155,9 +155,9 @@ def push(pos):
 
 
 count = 0
-verbose_start = 24965
-verbose = True
+verbose_start = 0
 verbose = False
+verbose = True
 while len(flowing) > 0:
 
     pos = flowing[-1]
@@ -202,7 +202,7 @@ while len(flowing) > 0:
         print(infinite)
         print(flowing[-10:])
         print_grid(pos)
-        sleep(0.5)
+        sleep(0.1)
     else:
         if count % 5000 == 0:
             print_grid(pos)

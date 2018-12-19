@@ -1,3 +1,5 @@
+from time import sleep
+
 # import data
 data = [line.strip() for line in open('18.in', 'r').readlines()]
 
@@ -53,7 +55,7 @@ def countresult():
 
 # Noticed repeating pattern from around ~ 480. Start collecting
 # results from then to get the repeat-chain.
-start_counting = 500
+start_counting = 00
 state = data
 scores = []
 for i in range(1,529):
@@ -83,6 +85,7 @@ for i in range(1,529):
 
     for row in state:
         print(''.join(row))
+    sleep(0.1)
 
 result = scores[(1000000000 - 500) % len(scores)]
 print('Part 2: %d' % result)

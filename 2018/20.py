@@ -99,7 +99,7 @@ depth = []
 res2 = 0
 while len(checked) < len(rooms):
     if count == 999:
-        # 1 for the starting room
+        #  for the starting room
         res2 = len(rooms) - len(checked) + 1
     if count % 20 == 0:
         print('Iteration: %d, checked %d of %d' % (count, len(checked),

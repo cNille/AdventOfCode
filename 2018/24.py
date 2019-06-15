@@ -30,13 +30,12 @@ class Unit(object):
     def effective_power(self):
         return self.damage * self.units
 
-    def attacked(self, damage):
+    def attacked(self, damage, by):
         units_killed = int(float(damage) / float(self.hitpoints))
-
         self.units -= units_killed
 
-        # print("%s attacked with %d damage! %d killed, %d left" %
-        #       (self.id, damage, units_killed, self.units))
+        print("%s attacked by %s with %d damage! %d killed, %d left" %
+              (self.id, by, damage, units_killed, self.units))
 
     def __repr__(self):
         return "%s = %d units; %d hp; %d initiative" % (
@@ -70,99 +69,90 @@ def attack_damage(unit, enemies):
     attack = []
     for enemy in enemies:
         damage = calc_damage(unit, enemy)
+        if damage <= 0:
+            continue
         attack.append((damage, unit.initiative, enemy.initiative, unit.id,
-                       enemy.id, enemy.effective_power()))
-    attack = sorted(attack, key=lambda x: (-x[0], -x[5], -x[2]))
-
-    if len(attack) > 0 and attack[0][0] <= 0:
-        return []
-
-    return attack
+                       enemy.id, enemy.effective_power(), enemy.hitpoints))
+    return sorted(attack, key=lambda x: (-x[0], -x[5], -x[2]))
 
 
-def target_phase(units):
-    damages = []
-    units = sorted(
-        units, key=lambda x: (x.effective_power(), x.initiative), reverse=True)
+def battle(units, boost):
 
-    #print('-' * 80)
-    #print('Damages')
-    targets = []
-    for unit in units:
-        damage = attack_damage(unit, get_enemies(unit, units))
-        #print(damage)
-        while len(damage) > 0:
-            _, _, _, attacker, target, _ = damage.pop(0)
-            if target in [x[1] for x in targets]:
+    i = 1
+    loosing_score = 1
+    while loosing_score > 0:
+        print('-' * 40)
+        print('Round %d' % i)
+
+        units = sorted(units, key=lambda x: (x.units))
+        print("Team immune")
+        for u in [u for u in units if u.team == "immune"]:
+            print("%s with %d units left" % (u.id, u.units))
+        print("Team infection")
+        for u in [u for u in units if u.team == "infection"]:
+            print("%s with %d units left" % (u.id, u.units))
+        print('')
+
+        # Target phase
+        damages = []
+        units = sorted(
+            units,
+            key=lambda x: (x.effective_power(), x.initiative),
+            reverse=True)
+
+        targets = []
+        for unit in units:
+            damages.append(attack_damage(unit, get_enemies(unit, units)))
+            for damage in damages[-1]:
+                _, _, _, attacker, target, _, _ = damage
+                if (attacker == 'immune 6'):
+                    print(attacker, target)
+                if target in [x[1] for x in targets]:
+                    continue
+                targets.append((attacker, target))
+                break
+        if i == 70:
+            print('')
+            print('Damages')
+            for d in damages:
+                print(d)
+            print('')
+            print('Targets')
+            for d in targets:
+                print(d)
+            print('')
+
+        # Attack phase
+        units = sorted(units, key=lambda x: x.initiative, reverse=True)
+        for unit in units:
+            if unit.units <= 0:
                 continue
-            targets.append((attacker, target))
-            break
-    #print('-' * 80)
-    #print('TARGETS')
-    #for t in targets:
-    #    print(t)
-    #print('-' * 80)
-    return targets
 
+            ts = [t for t in targets if t[0] == unit.id]
+            if len(ts) == 0:
+                continue
 
-def attack_phase(units, targets):
-    units = sorted(units, key=lambda x: x.initiative, reverse=True)
+            _, attacked_id = ts[0]
+            enemy = [e for e in units if e.id == attacked_id][0]
+            damage = calc_damage(unit, enemy)
+            enemy.attacked(damage, unit.id)
 
-    for unit in units:
-        if unit.units <= 0:
-            continue
+        units = [u for u in units if u.units > 0]
 
-        ts = [t for t in targets if t[0] == unit.id]
-        if len(ts) == 0:
-            continue
+        loosing_score = min(
+            len([_ for _ in units if _.team == 'immune']),
+            len([_ for _ in units if _.team != 'immune']),
+        )
+        i += 1
 
-        _, attacked_id = ts[0]
-        enemy = [e for e in units if e.id == attacked_id][0]
-        damage = calc_damage(unit, enemy)
-        #print('ATTACK', unit, enemy)
-        enemy.attacked(damage)
-
-    return [u for u in units if u.units > 0]
-
-
-i = 1
-while loosing_score > 0:
-    print('-' * 80)
-    print('Round %d' % i)
-
-    if i > 70 and False:
-        exit()
-
-    immune = [u for u in units if u.team == 'immune']
-    infection = [u for u in units if u.team == 'infection']
-
-    print('Immune system:')
-    for u in immune:
-        print("%s has %d units" % (u.id, u.units))
-    print('Infection:')
-    for u in infection:
-        print("%s has %d units" % (u.id, u.units))
+    print('@' * 80)
     print('')
+    print('GAME OVER')
+    print('')
+    for u in units:
+        print("%s with %d units left" % (u.id, u.units))
+    print('')
+    print('Result: %d' % sum([u.units for u in units]))
 
-    targets = target_phase(units)
-    units = attack_phase(units, targets)
 
-    loosing_score = min(
-        len([_ for _ in units if _.team == 'immune']),
-        len([_ for _ in units if _.team != 'immune']),
-    )
-    i += 1
-
-print('@' * 80)
-print('@' * 80)
-print('')
-print('GAME OVER')
-print('')
-for u in units:
-    print("%s with %d units left" % (u.id, u.units))
-print('')
-print('Result: %d' % sum([u.units for u in units]))
-
-# Too low: 13216
-# Too low: 13311
-# Correct: 13327
+battle(units, 0)

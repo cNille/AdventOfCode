@@ -1,7 +1,6 @@
 data = open('24.in', 'r').read().split('\n\n')
+
 #data = open('24test.in', 'r').read().split('\n\n')
-immune = [line for line in data[0].split('\n')[1:] if len(line) > 0]
-infection = [line for line in data[1].split('\n')[1:] if len(line) > 0]
 
 
 class Unit(object):
@@ -34,21 +33,24 @@ class Unit(object):
         units_killed = int(float(damage) / float(self.hitpoints))
         self.units -= units_killed
 
-        print("%s attacked by %s with %d damage! %d killed, %d left" %
-              (self.id, by, damage, units_killed, self.units))
+        # print("%s attacked by %s with %d damage! %d killed, %d left" %
+        #       (self.id, by, damage, units_killed, self.units))
 
     def __repr__(self):
         return "%s = %d units; %d hp; %d initiative" % (
             self.id, self.units, self.hitpoints, self.initiative)
 
 
-immune = [Unit(line, 'immune', idx) for idx, line in enumerate(immune)]
-infection = [
-    Unit(line, 'infection', idx) for idx, line in enumerate(infection)
-]
-units = immune + infection
-unit_ids = [u.id for u in units]
-loosing_score = len(immune)
+def parse_data(data):
+    immune = [line for line in data[0].split('\n')[1:] if len(line) > 0]
+    infection = [line for line in data[1].split('\n')[1:] if len(line) > 0]
+
+    immune = [Unit(line, 'immune', idx) for idx, line in enumerate(immune)]
+    infection = [
+        Unit(line, 'infection', idx) for idx, line in enumerate(infection)
+    ]
+    units = immune + infection
+    return units
 
 
 def get_enemies(unit, others):
@@ -79,19 +81,25 @@ def attack_damage(unit, enemies):
 def battle(units, boost):
 
     i = 1
+    unit_ids = [u.id for u in units]
+    for unit in units:
+        if unit.team == 'immune':
+            unit.damage += boost
     loosing_score = 1
+    did_attack = False
     while loosing_score > 0:
-        print('-' * 40)
-        print('Round %d' % i)
+        if i % 1000000 == 0:
+            print('-' * 40)
+            print('Round %d' % i)
 
-        units = sorted(units, key=lambda x: (x.units))
-        print("Team immune")
-        for u in [u for u in units if u.team == "immune"]:
-            print("%s with %d units left" % (u.id, u.units))
-        print("Team infection")
-        for u in [u for u in units if u.team == "infection"]:
-            print("%s with %d units left" % (u.id, u.units))
-        print('')
+            units = sorted(units, key=lambda x: (x.units))
+            print("Team immune")
+            for u in [u for u in units if u.team == "immune"]:
+                print("%s with %d units left" % (u.id, u.units))
+            print("Team infection")
+            for u in [u for u in units if u.team == "infection"]:
+                print("%s with %d units left" % (u.id, u.units))
+            print('')
 
         # Target phase
         damages = []
@@ -105,25 +113,13 @@ def battle(units, boost):
             damages.append(attack_damage(unit, get_enemies(unit, units)))
             for damage in damages[-1]:
                 _, _, _, attacker, target, _, _ = damage
-                if (attacker == 'immune 6'):
-                    print(attacker, target)
                 if target in [x[1] for x in targets]:
                     continue
                 targets.append((attacker, target))
                 break
-        if i == 70:
-            print('')
-            print('Damages')
-            for d in damages:
-                print(d)
-            print('')
-            print('Targets')
-            for d in targets:
-                print(d)
-            print('')
-
         # Attack phase
         units = sorted(units, key=lambda x: x.initiative, reverse=True)
+        did_attack = False
         for unit in units:
             if unit.units <= 0:
                 continue
@@ -136,6 +132,8 @@ def battle(units, boost):
             enemy = [e for e in units if e.id == attacked_id][0]
             damage = calc_damage(unit, enemy)
             enemy.attacked(damage, unit.id)
+            if damage >= enemy.hitpoints:
+                did_attack = True
 
         units = [u for u in units if u.units > 0]
 
@@ -143,16 +141,22 @@ def battle(units, boost):
             len([_ for _ in units if _.team == 'immune']),
             len([_ for _ in units if _.team != 'immune']),
         )
+
+        if not did_attack:
+            return ('draw', 0)
+
         i += 1
 
-    print('@' * 80)
-    print('')
-    print('GAME OVER')
-    print('')
-    for u in units:
-        print("%s with %d units left" % (u.id, u.units))
-    print('')
-    print('Result: %d' % sum([u.units for u in units]))
+    winner = units[0].team
+    points = sum([u.units for u in units])
+    return (winner, points)
 
 
-battle(units, 0)
+winner = ''
+boost = 0
+while winner != 'immune':
+    units = parse_data(data)
+    winner, points = battle(units, boost)
+    print("BOOST %d == %s won with %d points" % (boost, winner, points))
+
+    boost += 1

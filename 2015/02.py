@@ -13,3 +13,11 @@ for (w, l, h) in sizes:
 print("Result part 1: %d" % paper)
 
 # Part 2:
+
+sortedSizes = [sorted(s) for s in sizes]
+ribbon = 0
+for s in sortedSizes:
+    ribbon += 2 * s[0] + 2 * s[1]
+    ribbon += s[0] * s[1] * s[2]
+
+print("Result part 2: %d" % ribbon)

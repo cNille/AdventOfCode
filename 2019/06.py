@@ -7,6 +7,8 @@ content = [x.strip() for x in f.readlines()]
 # - Recursive functions?
 # - Dequeue and search distance to all.
 # - Use networkx.DiGraph
+# - Part 2: Traversing the paths in reverse. And calculating how many orbits
+#           that are left when they start to differ
 
 
 # ================================================

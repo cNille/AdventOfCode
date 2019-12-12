@@ -1,3 +1,59 @@
+from intcode import *
+input_code = open('07.input', 'r').readline().strip()
+input_code = '3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5'
+
+phaseSettings = permutations([5,6,7,8,9])
+res = 0
+p = []
+values = {}
+
+for phase in phaseSettings:
+    phase = [9,8,7,6,5]
+    names = ["A", "B", "C","D","E"]
+    stream = Streams(names)
+    programs = [
+        Program(IntCode(input_code), name="A", stream=stream),
+        Program(IntCode(input_code), name="B", stream=stream),
+        Program(IntCode(input_code), name="C", stream=stream),
+        Program(IntCode(input_code), name="D", stream=stream),
+        Program(IntCode(input_code), name="E", stream=stream),
+    ]
+    stream.add("A", phase[0])
+    stream.add("A", 0)
+    stream.add("B", phase[1])
+    stream.add("C", phase[2])
+    stream.add("D", phase[3])
+    stream.add("E", phase[4])
+    
+    count = 0
+    while count < 100:   
+        count += 1
+        for out in programs[0].run():
+            stream.add(names[1], out)
+            break
+        for out in programs[1].run():
+            stream.add(names[2], out)
+            break
+        for out in programs[2].run():
+            stream.add(names[3], out)
+            break
+        for out in programs[3].run():
+            stream.add(names[4], out)
+            break
+        for out in programs[4].run():
+            stream.add(names[0], out)
+            E = out 
+            if E > res:
+                res = E
+                p = phase
+            break
+
+
+    exit()
+
+print('Part 2 result: %d ' % res)
+exit()
+
 from itertools import permutations
 from collections import deque 
 

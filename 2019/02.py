@@ -1,13 +1,14 @@
 from intcode import *
 input_code = '1,9,10,3,2,3,11,0,99,30,40,50'
 input_code = open('02.input', 'r').readline().strip()
+stream = Streams([])
 
 
 # Part 1 
 intcode = IntCode(input_code)
 intcode.instructions[1] = 12
 intcode.instructions[2] = 2
-program = Program(intcode)
+program = Program(intcode, name="A", stream=stream)
 for stack in  program.run(get_stack=True):
     print("Part 1: %d" % stack.stack[0])
 
@@ -19,7 +20,7 @@ for x in range(100):
         intcode = IntCode(input_code)
         intcode.instructions[1] = x 
         intcode.instructions[2] = y 
-        program = Program(intcode)
+        program = Program(intcode, name="B", stream=stream)
         for stack in  program.run(get_stack=True):
             answ = stack.stack[0]
             if answ == needle:

@@ -10,6 +10,7 @@ OP_JIT = 5
 OP_JIF = 6
 OP_LES = 7
 OP_EQL = 8
+OP_REL = 9
 OP_END = 99
         
 class IntCode:
@@ -45,8 +46,10 @@ class Stack:
         assert isinstance(intcode, IntCode)
         self.stack = intcode.get_code()
         self.index = 0
+        self.relative = 0
         #self.manual_update = True
         self.waiting = False
+        self.memory = {}
 
     def execute(self):
         while self.index < len(self.stack): 
@@ -56,82 +59,98 @@ class Stack:
             # if not self.manual_update:
             #     self.index += 1
             # self.manual_update = False
-            yield self.stack[self.index]
+            inst= self._get(self.index)
+            yield inst
             
     def wait(self):
         self.waiting = True
+
+    def update_relative(self, r):
+        self.relative += r
 
     def update_index(self, new_index):
         self.index = new_index
         # self.manual_update = True
 
+    def save_immediately(self, address, value):
+        if address > len(self.stack) or address < 0:
+            self.memory[address] = value
+        else:
+            self.stack[address] = value
+
     def save_value(self, address, value):
-        self.stack[self.stack[address]] = value
+        a = self._get(address)
+        if a > len(self.stack) or a < 0:
+            self.memory[a] = value
+        else:
+            self.stack[a] = value
 
     def get_immediate(self,address):
-        return self.stack[address]
+        return self._get(address) 
 
     def get_value(self,address):
-        return self.stack[self.stack[address]]
+        return self._get(self._get(address))
+
+    def get_relative(self,address):
+        return self._get(self._get(address) + self.relative)
+
+    def _get(self, address):
+        if address > len(self.stack):
+            if address not in self.memory:
+                self.memory[address] = 0
+            return self.memory[address]
+        else:
+            return self.stack[address]
 
 class OpCode:
     def __init__(self, code):
         self.code = code % 100
-        self.mode_a = code % 1000
-        self.mode_a = self.mode_a > 99
-        self.mode_b = code % 10000
-        self.mode_b = self.mode_b > 999
-        self.mode_c = code % 100000
-        self.mode_c = self.mode_c > 9999
+        self.mode_a = (code % 1000) / 100
+        self.mode_b = (code % 10000) / 1000
+        self.mode_c = (code % 100000) / 10000
 
     def __str__(self):
-        return "%d %s %s %s " % (self.code, str(self.mode_a),str(self.mode_b),  str(self.mode_b))
+        return "Opcode(%d %d %d %d)" % (self.code, self.mode_a, self.mode_b, self.mode_c)
+
+
+def get_param(self, mode, idx_diff):
+    idx = self.stack.index + idx_diff
+    if mode == 0:
+        return self.stack.get_value(idx)
+    elif mode == 1:
+        return self.stack.get_immediate(idx)
+    elif mode == 2:
+        return self.stack.get_relative(idx)
 
 def one_input(func):
     def f(self, opcode):
-        if opcode.mode_a:
-            A = self.stack.get_immediate(self.stack.index + 1)
-        else:
-            A = self.stack.get_value(self.stack.index + 1)
-        func(self,A)
+        A = get_param(self, opcode.mode_a,  1)
+        func(self,A, opcode.mode_a)
         self.stack.update_index(self.stack.index + 2)
     return f
 
 def two_input(func):
     def f(self, opcode):
-        if opcode.mode_a:
-            A = self.stack.get_immediate(self.stack.index + 1)
-        else:
-            A = self.stack.get_value(self.stack.index + 1)
-        if opcode.mode_b:
-            B = self.stack.get_immediate(self.stack.index + 2)
-        else:
-            B = self.stack.get_value(self.stack.index + 2)
+        A = get_param(self, opcode.mode_a,  1)
+        B = get_param(self, opcode.mode_b,  2)
         func(self,A, B)
         self.stack.update_index(self.stack.index + 3)
     return f
 
 def three_input(func):
     def f(self, opcode):
-        if opcode.mode_a:
-            A = self.stack.get_immediate(self.stack.index + 1)
-        else:
-            A = self.stack.get_value(self.stack.index + 1)
-        if opcode.mode_b:
-            B = self.stack.get_immediate(self.stack.index + 2)
-        else:
-            B = self.stack.get_value(self.stack.index + 2)
-        if opcode.mode_c:
-            C = self.stack.get_immediate(self.stack.index + 3)
-        else:
-            C = self.stack.get_value(self.stack.index + 3)
-
-        func(self,A,B,C)
+        A = get_param(self, opcode.mode_a,  1)
+        B = get_param(self, opcode.mode_b,  2)
+        if opcode.mode_c == 2:
+            C = self.stack.relative + get_param(self, 1, 3)  
+        else: 
+            C = self.stack.index + 3 
+        func(self,A,B,C, opcode.mode_c)
         self.stack.update_index(self.stack.index + 4)
     return f
 
 class Program:
-    def __init__(self, intcode, stream=None, name="", verbose=False):
+    def __init__(self, intcode, stream=None, name="", verbose=True):
         assert stream != None
         assert len(name) > 0
         self.intcode = intcode
@@ -151,6 +170,7 @@ class Program:
             OP_JIF: self.jumpfalse,
             OP_LES: self.less,
             OP_EQL: self.equals,
+            OP_REL: self.relative,
         }
         self.verbose = verbose
 
@@ -159,26 +179,38 @@ class Program:
             print(args)
 
     @three_input
-    def add(self, A, B, C):
-        self.stack.save_value(self.stack.index+3, A + B)
+    def add(self, A, B, C, mode_c):
+        if mode_c == 2:
+            self.stack.save_immediately(C, A + B)
+            return
+        self.stack.save_value(C, A + B)
 
     @three_input
-    def multiply(self, A, B, C):
-        self.stack.save_value(self.stack.index+3, A * B)
+    def multiply(self, A, B, C, mode_c):
+        if mode_c == 2:
+            self.stack.save_immediately(C, A * B)
+            return
+        self.stack.save_value(C, A * B)
         
     @one_input
-    def stdin(self, inp):
-        self.log("Input", self.name, self.args)
+    def stdin(self, A, mode):
+        #self.log("Input", self.name, self.args)
         if self.stream.hasNext(self.name):
             val = self.stream.popleft(self.name)
-            A = self.stack.get_immediate(self.stack.index + 1)
-            self.stack.save_value(self.stack.index+1, val)
+
+            if mode == 2:
+                v = self.stack.get_immediate(self.stack.index + 1)
+                self.stack.save_immediately(self.stack.relative + v, val)
+            else:
+                self.stack.save_value(self.stack.index+1, val)
         else:
             self.stack.wait()
 
     @one_input
-    def stdout(self, A):
-        self.log("Output", self.name, A)
+    def stdout(self, A, mode):
+        #self.log("Output", self.name, A)
+        #if A != 0:
+        #    exit()
         self.output.append(A)
 
     @two_input
@@ -192,18 +224,36 @@ class Program:
             self.stack.update_index(B-3)
 
     @three_input
-    def less(self, A, B, C):
+    def less(self, A, B, C, mode_c):
+
+        if mode_c == 2:
+            if A < B:
+                self.stack.save_immediately(C, 1)
+            else:
+                self.stack.save_immediately(C, 0)
+            return
+            
         if A < B:
-            self.stack.save_value(self.stack.index+3, 1)
+            self.stack.save_value(C, 1)
         else:
-            self.stack.save_value(self.stack.index+3, 0)
+            self.stack.save_value(C, 0)
 
     @three_input
-    def equals(self, A, B, C):
+    def equals(self, A, B, C, mode_c):
+        if mode_c == 2:
+            if A == B:
+                self.stack.save_immediately(C, 1)
+            else:
+                self.stack.save_immediately(C, 0)
+            return
         if A == B:
-            self.stack.save_value(self.stack.index+3, 1)
+            self.stack.save_value(C, 1)
         else:
-            self.stack.save_value(self.stack.index+3, 0)
+            self.stack.save_value(C, 0)
+
+    @one_input
+    def relative(self, A, mode):
+        self.stack.update_relative(A)
         
     def run(self, *argv, **kwargs):
         get_stack = False
@@ -212,11 +262,10 @@ class Program:
                 if key == 'get_stack':
                     get_stack = True
         
-        count = 0 
         for instruction in self.stack.execute():
-            count += 1
+            #print "INSTRUCTION", instruction
             op = OpCode(instruction)
-            self.log(self.name, self.stack.index, self.stack.stack[self.stack.index:self.stack.index+4])
+            # self.log(self.name, self.stack.index, self.stack.stack[self.stack.index:self.stack.index+4])
 
             if op.code == OP_END:
                 break

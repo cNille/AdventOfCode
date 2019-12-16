@@ -33,7 +33,7 @@ class Streams:
         return val
 
     def log(self):
-        return self.inputStreams
+        print(self.inputStreams)
 
     def hasNext(self,name):
         return len(self.inputStreams[name]) > 0
@@ -73,14 +73,14 @@ class Stack:
         # self.manual_update = True
 
     def save_immediately(self, address, value):
-        if address > len(self.stack) or address < 0:
+        if address >= len(self.stack) or address < 0:
             self.memory[address] = value
         else:
             self.stack[address] = value
 
     def save_value(self, address, value):
         a = self._get(address)
-        if a > len(self.stack) or a < 0:
+        if a >= len(self.stack) or a < 0:
             self.memory[a] = value
         else:
             self.stack[a] = value
@@ -95,7 +95,7 @@ class Stack:
         return self._get(self._get(address) + self.relative)
 
     def _get(self, address):
-        if address > len(self.stack):
+        if address >= len(self.stack) or address < 0:
             if address not in self.memory:
                 self.memory[address] = 0
             return self.memory[address]
@@ -204,13 +204,12 @@ class Program:
             else:
                 self.stack.save_value(self.stack.index+1, val)
         else:
+            self.stack.update_index(self.stack.index - 2)
             self.stack.wait()
 
     @one_input
     def stdout(self, A, mode):
         #self.log("Output", self.name, A)
-        #if A != 0:
-        #    exit()
         self.output.append(A)
 
     @two_input

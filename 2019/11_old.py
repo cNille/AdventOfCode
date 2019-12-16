@@ -1,5 +1,6 @@
 from itertools import permutations
 from collections import deque 
+from intcode import *
 
 content = open('11.input', 'r').readline().strip()
 
@@ -189,16 +190,19 @@ count = 0
 while len(panels.keys()) < 10000:
     count += 1
     position = positions[-1]
-    print("%d CURRENT POSITION: %d %d" % (count, position[0], position[1]), datas['a'][1]) 
+    #print("%d CURRENT POSITION: %d %d" % (count, position[0], position[1]), datas['a'][1]) 
     if position not in panels:
         panels[position] = 0
 
     curr_panel_color = panels[position]
+    print("input", curr_panel_color)
     outputStore['a'].append(curr_panel_color)
     program('a')
 
     outputted = outputStore['b']
-    if count % 100000 == 0:
+    print "outputted", outputted
+    if count % 100 == 0:
+        exit()
         print(count)
     if len(outputted) == 0:
         break
@@ -226,7 +230,7 @@ while len(panels.keys()) < 10000:
     positions.append(new_pos)
     if count % 50 == 0:
         print_panels(panels, positions)
-    #print_panels(panels, positions)
+    print_panels(panels, positions)
 
 print_panels(panels, positions)
 print("Result: %d " % len(panels.keys()))

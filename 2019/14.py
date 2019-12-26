@@ -1,95 +1,63 @@
 from fractions import gcd
+from collections import deque
+from collections import defaultdict
+from math import ceil
+data = [x.strip() for x in open('14.input', 'r').readlines()]
 
-data = [x.strip() for x in open('14.input2', 'r').readlines()]
-
-for d in data:
-    print d
-print '-'*50
-
-recipe = {}
+recipes = {}
 for d in data:
     ing, res = d.split(' => ')
-
     amount, name = res.split(' ')
     required_ingredients = [a.split(' ') for a in ing.split(', ')]
     required_ingredients = [(int(a),b) for a,b in required_ingredients]
     req = {}
     for a,b in required_ingredients:
         req[b] = int(a)
-        
-    if name in recipe:
-        print "ALREADY IN GAME", name, recipe
-    recipe[name] = (int(amount), req)
+    recipes[name] = (int(amount), req)
 
-print(recipe)
+def calculate(amount, recipes):
+    orders = deque()
+    leftovers = defaultdict(int)
+    required = 0
+    orders.append(("FUEL", amount))
 
-def requires(recipe, ingredient_name, requested_amount, level, unused_ingredients):
-    print('-'*40)
-    print "CHECKING (%d) %s %d" % (level, ingredient_name, requested_amount)
-    amount, ingredients = recipe[ingredient_name]
-    print "Ingredients: ", amount, ingredients
-    
-    produced = {}
-    used = {}
-    if ingredient_name not in produced:
-        produced[ingredient_name] = 0
-    for name in ingredients:
-        #print name
-        if name in recipe:
-            #print "in recipe", name
-            produced_amount, _ = recipe[name]
-            p, u = requires(recipe, name, ingredients[name], level+1, unused_ingredients)
+    while len(orders) > 0:
+        order = orders.popleft()
+        name, amount = order
 
-            for x in p:
-                if x not in produced:
-                    produced[x] = 0
-                produced[x] += p[x]
-            for x in u:
-                if x not in unused_ingredients:
-                    unused_ingredients[x] = {}
-                for y in x:
-                    if y not in unused_ingredients[x]:
-                        unused_ingredients[x][y] = 0
-                    unused_ingredients[x][y] += u[x][y]
+        if name == "ORE":
+            required += amount
+        elif amount <= leftovers[name]:
+            leftovers[name] -= amount
         else:
-            print "not in recipe", name, requested_amount, unused_ingredients
+            needed = amount - leftovers[name]
 
-            if ingredient_name not in unused_ingredients:
-                unused_ingredients[ingredient_name] = {}
-            if  name not in unused_ingredients[ingredient_name]:
-                unused_ingredients[ingredient_name][name] = 0
+            recipe = recipes[name]
+            produced, ingredients = recipe
 
-            unused = unused_ingredients[ingredient_name][name]
+            factor = ceil( needed / produced )
+            for i_name in ingredients:
+                orders.append((i_name, ingredients[i_name] * factor))
+            leftover = (factor * produced) - needed
+            leftovers[name] = leftover
+    return required
+        
+part1 = calculate(1, recipes)
+print "Part 1: %d " % part1
 
-            produce_amount, required =  recipe[ingredient_name]
-            required = required[name]
-            #print produce_amount, required
-            
-            p = unused if unused > produce_amount else produce_amount - unused
-            produced_ing = ((p) / requested_amount) * required
-            print 123, produced_ing
-            # TODO:
-            # Figure out how to handle big requested amounts when there is a lot of unused
-            unused = produced_ing - requested_amount
+max_ore = 1000000000000
+max_succeeded = 0
+curr = max_ore / part1
+alpha = part1
+max_found = False
+for _ in range(100):
+    #print "Trying: %d, alpha: %d, current max: %d " % (curr, alpha, max_succeeded)
+    required = calculate(curr, recipes)
+    if required > max_ore:
+        curr -= alpha
+        alpha = max(alpha / 2, 1)
+        continue
+    max_succeeded = round(max(max_succeeded, curr))
+    curr += alpha
 
-            unused_ingredients[ingredient_name][name] += unused 
-
-            if name not in produced:
-                produced[name] = 0
-            produced[name] += produced_ing
-
-    #print "Returning", produced, unused_ingredients
-    return produced, unused_ingredients
-    
-
-produced, _ = requires(recipe, "FUEL", 1, 1, {})
-
-#print '@' * 20
-#print produced
-#print '@' * 20
-
-print "Requires:"
-for p in produced:
-    if produced[p] >0:
-        print "\t%s: %d " % (p, produced[p])
-
+print "Part 2: %d" % max_succeeded

@@ -1,10 +1,19 @@
 from time import sleep
 vault = [x.strip() for x in open('18.input', 'r').readlines()]
 
+class Navigator:
+    def __init__(self, vault, x,y, steps, keysleft, keyname):
+        self.vault = vault
+        self.x = x
+        self.y = y
+        self.steps = steps
+        self.keysleft = keysleft
+        self.keyname = keyname
 
 doors = {}
 locks = {}
 lock_pos = {}
+lock_keys = ""
 pos = None
 for y, row in enumerate(vault):
     for x, c in enumerate(row):
@@ -15,6 +24,7 @@ for y, row in enumerate(vault):
         if c.islower():
             locks[(x,y)] = c 
             lock_pos[c] = (x,y)
+            lock_keys += c
 
 def getNextSteps(vault,x,y,path):
     directions = [ (1,0), (-1,0), (0,-1), (0,1) ]
@@ -31,20 +41,6 @@ def getNextSteps(vault,x,y,path):
 def updateVault(vault, x,y, c):
     vault[y] = vault[y][:x] + c + vault[y][x+1:]
     return vault
-
-class Navigator:
-    def __init__(self, vault, x,y, steps, visited, dependencies):
-        self.vault = vault
-        self.x = x
-        self.y = y
-        self.steps = steps
-        self.visited = visited
-        self.dependencies = dependencies
-
-    def __str__(self):
-        return "Nav(%d, %d, %d)" % (self.x, self.y, self.steps)
-    def __repr__(self):
-        return "Nav(%d, %d, %d)" % (self.x, self.y, self.steps)
 
 # Remove start character from map
 x,y = pos
@@ -95,8 +91,6 @@ def getDistances(vault, x, y, locks):
         steps += 1
     return dist
 
-
-print "Get distances...."
 distances = {}
 #for (lx,ly) in locks:
 #    distances[(lx,ly)] = getDistances(vault, lx,ly, locks)
@@ -104,73 +98,45 @@ distances = {(77, 77): {'a': 246, 'c': 156, 'b': 220, 'e': 354, 'd': 14, 'g': 48
 x,y = pos
 distances[(x,y)] = getDistances(vault, x,y,locks)
 
-print "Get dependencies...."
 #dependencies = getDependencies(vault, x,y, locks)
 dependencies = {'a': '@', 'c': '@JV', 'b': '@IW', 'e': '@R', 'd': '@', 'g': '@ODNFC', 'f': '@P', 'i': '@', 'h': '@', 'k': '@', 'j': '@ODNF', 'm': '@ODNFCTZ', 'l': '@', 'o': '@I', 'n': '@R', 'q': '@RU', 'p': '@IWE', 's': '@', 'r': '@O', 'u': '@ODNFC', 't': '@RUG', 'w': '@', 'v': '@ODNF', 'y': '@ODNFC', 'x': '@', 'z': '@ODNFCT'}
 
-print locks
-print lock_pos
-print distances
-print dependencies
-print("")
-print("")
-print("")
-print("")
-
 
 # ===================================
 # ===================================
-
-def getLockDistances(vault, x, y, locks):
-    print("aoeu" )
-
-
-def copy(a):
-    return "\n".join(a).split('\n')
 
 x,y = pos
-locks[(40,40)] = 0
-visited = ["@"]
-paths = [Navigator(vault, x,y, 0, visited, dependencies)]
-
 min_steps = 99999
-count = 0
+navigator = Navigator(vault, x,y, 0, lock_keys, "@")
 
-while len(paths) > 0:
-    nav = paths.pop(0)
-    if nav.steps < min_steps and len(nav.visited) >= len(locks):
-        min_steps = min_steps if min_steps < nav.steps else nav.steps
-        print "New min found at: %d " % nav.steps
+cache = {}
+def find_shortest_path(nav, level):
+    keysleft = "".join(sorted(nav.keysleft))
+    if len(keysleft) == 0:
+        return 0
+        return nav.steps
+    if (nav.keyname, keysleft) in cache:
+        return cache[(nav.keyname, keysleft)]
 
-    count += 1
-    if count % 100000 == 0:
-        print "Iteration %d , %d" % (count, len(paths))
+    shortest = 9999
+    for key in [nd for nd in dependencies if nd in keysleft]:
+        blocking_doors = [x for x in dependencies[key] if x.lower() in keysleft]
+        if len(blocking_doors) > 0:
+            continue
 
-    possible = []
-    new_dep = {}
-    for d in [nd for nd in nav.dependencies if nd not in nav.visited]:
-        new_dep[d] = [x for x in nav.dependencies[d] if x.lower() not in nav.visited]
+        distance = distances[(nav.x, nav.y)][key]
+        left = [x for x in keysleft if x != key]
+        lx,ly = lock_pos[key]
+        next_nav = Navigator(vault, lx, ly, distance, left, key)
 
-        if len(new_dep[d]) == 0:
-            possible.append(d)
+        path_distance = find_shortest_path(next_nav, level+1)
+        shortest = min(path_distance + distance, shortest)
 
-    if len(possible) == 0:
-        continue
-            
-    new_paths = []
-    for p in possible:
-        distance = distances[(nav.x, nav.y)][p]
-        lx,ly = lock_pos[p]
+    shortest_path = shortest
+    cache[(nav.keyname, keysleft)] = shortest_path 
+    return shortest_path
 
-        visited = nav.visited + [p]
-        if (distance + nav.steps) < min_steps:
-            new_paths.append(Navigator(vault, lx, ly, distance + nav.steps, visited, new_dep))
+dependencies['@'] = '' 
+res = find_shortest_path(navigator, 0)
 
-    paths = sorted(new_paths, key=lambda n: n.steps) + paths
-
-
-
-# too high: 5420
-# too high: 5308
-# too high: 5156
-# too high: 5044
+print "Part 1:", res

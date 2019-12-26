@@ -205,6 +205,7 @@ class Program:
                 self.stack.save_value(self.stack.index+1, val)
         else:
             self.stack.update_index(self.stack.index - 2)
+            self.wait = True
             self.stack.wait()
 
     @one_input
@@ -264,7 +265,8 @@ class Program:
         for instruction in self.stack.execute():
             #print "INSTRUCTION", instruction
             op = OpCode(instruction)
-            # self.log(self.name, self.stack.index, self.stack.stack[self.stack.index:self.stack.index+4])
+            #self.log(self.name, self.stack.index, self.stack.stack[self.stack.index:self.stack.index+4])
+            
 
             if op.code == OP_END:
                 break
@@ -277,6 +279,9 @@ class Program:
             if len(self.output) > 0:
                 yield self.output.pop(0) 
 
-        self.wait = False
+        if self.wait:
+            #yield "INPUT" 
+            self.wait = False
+            return
         if get_stack:
             yield self.stack

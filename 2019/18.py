@@ -93,23 +93,25 @@ def find_shortest_path(nav, level, dependencies, distances, lock_pos):
         if len(blocking_doors) > 0:
             continue
 
+        distance = None
         for i in range(len(nav.x)):
             if (nav.x[i], nav.y[i]) in distances and key in distances[(nav.x[i], nav.y[i])]:
                 distance = distances[(nav.x[i], nav.y[i])][key]
                 curr_i = i
-        left = [x for x in keysleft if x != key]
-        lx,ly = lock_pos[key]
+                break
+        assert distance != None
 
+        lx,ly = lock_pos[key]
         xs = nav.x[:curr_i] + [lx] + nav.x[curr_i+1:]
         ys = nav.y[:curr_i] + [ly] + nav.y[curr_i+1:]
+        left = [x for x in keysleft if x != key]
 
         next_nav = Navigator(xs, ys, distance, left, key)
         path_distance = find_shortest_path(next_nav, level+1, dependencies, distances, lock_pos)
         shortest = min(path_distance + distance, shortest)
 
-    shortest_path = shortest
-    cache[(nav.keyname, keysleft)] = shortest_path 
-    return shortest_path
+    cache[(nav.keyname, keysleft)] = shortest 
+    return shortest 
 
 def part1(vault):
     doors, locks, lock_pos, lock_keys, pos = get_vault_data(vault)
@@ -128,13 +130,13 @@ def part1(vault):
 
     navigator = Navigator([x],[y], 0, lock_keys, "@")
     print "Part 1:", find_shortest_path(navigator, 0, dependencies, distances, lock_pos)
-part1(vault)
+#part1(vault)
 
 # ===================================
 # ===================================
 
 # Part 2
-print "Part 2"
+print "Starting part 2..."
 vault = [x.strip() for x in open('18.input_part2', 'r').readlines()]
 
 cache = {}
@@ -163,6 +165,5 @@ def part2(vault):
     navigator = Navigator(xs, ys, 0, lock_keys, "@")
     print "Part 2:", find_shortest_path(navigator, 0, dependencies, distances, lock_pos)
 part2(vault)
-
 
 # Too high: 2088

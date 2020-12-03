@@ -1,6 +1,9 @@
 f = open('02.input', 'r')
 data = [x.strip() for x in f.readlines()]
 
+# Assumptions:
+# - 1010 is not present
+
 def part1(data):
     total = 0
     for x in data:

@@ -1,6 +1,9 @@
 f = open('03.input', 'r')
 data = [x.strip() for x in f.readlines()]
 
+# Assumptions:
+# - No tree in (0,0)
+
 def part1(data):
     x = 0
     total = 0

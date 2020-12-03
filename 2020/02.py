@@ -7,7 +7,7 @@ def part1(data):
         span, letter, pw = x.split()
         start, end = map(int, span.split('-'))
         count = pw.count(letter[0])
-        if start <= count and count <= end:
+        if start <= count <= end:
             total +=1
     return total
 
@@ -34,20 +34,16 @@ def part1functional(data):
         span, letter, pw = line.split()
         start, end = map(int, span.split('-'))
         count = pw.count(letter[0])
-        return start <= count and count <= end
+        return start <= count <= end
     valid_passwords = filter(validate, data)
     return len(valid_passwords)
 
 import re
 def part1regex(data):
     def validate(line):
-        m = re.match(r'(\d+)-(\d+) (\w): (\w+)', line)
-        start = int(m.group(1))
-        end = int(m.group(2))
-        letter = m.group(3)
-        password = m.group(4)
-
-        count = password.count(letter)
-        return start <= count and count <= end
+        start, end, ch, pw = re.search(r'(\d+)-(\d+) (.): (\w+)', line).groups()
+        return int(start) <= pw.count(ch) <= int(end)
     valid_passwords = filter(validate, data)
     return len(valid_passwords)
+
+print(part1regex(data))

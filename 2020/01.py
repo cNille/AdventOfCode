@@ -1,4 +1,3 @@
-f = open('01.test', 'r')
 f = open('01.input', 'r')
 content = [int(x.strip()) for x in f.readlines()]
 
@@ -43,6 +42,19 @@ def part2(arr):
             return x * rests[rest]
 
 print("Part 2 solution: %d" % part2(content))
+
+def part1functional(arr):
+    return [
+        a * b 
+        for (a,b)
+        in filter(
+            lambda (a,b): a in arr and b in arr,
+            zip(range(0, 1010, 1), range(2020, 1010, -1))
+        )
+    ][0]
+
+print part1functional(content)
+
 
 # def part1(arr):
 #     rests = {}

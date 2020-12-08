@@ -68,9 +68,7 @@ def execute_program(lines):
 def part1quick(lines):
     _, result = execute_program(lines)
     return result
-print '--'
 print part1quick(lines)
-print '--'
 exit()
 
 def part2(lines):

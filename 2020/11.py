@@ -8,11 +8,11 @@ deltas= [
 
 EMPTY = '-'
 OCC = '#'
-SPACE = '.'
+SPACE = ' '
 
 t = []
 for l in lines:
-    t.append(l.replace('L', EMPTY))
+    t.append(l.replace('L', EMPTY).replace('.',SPACE))
 lines = t 
 
 def part1(data):
@@ -105,7 +105,7 @@ def round(data):
         #new_map = part2(currentmap)
         new_map = part1(currentmap)
         stale = "".join(new_map) == "".join(currentmap)
-        sleep(0.05)
+        sleep(0.3)
         for x in data:
             sys.stdout.write(u"\u001b[%dD" % len(data))
             sys.stdout.write(u"\u001b[%dA" % len(data))

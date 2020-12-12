@@ -102,13 +102,13 @@ def round(data):
     i = 0
     while not stale:
         i+=1
-        #new_map = part2(currentmap)
-        new_map = part1(currentmap)
+        new_map = part2(currentmap)
+        #new_map = part1(currentmap)
         stale = "".join(new_map) == "".join(currentmap)
-        sleep(0.3)
+        sleep(0.04)
         for x in data:
-            sys.stdout.write(u"\u001b[%dD" % len(data))
-            sys.stdout.write(u"\u001b[%dA" % len(data))
+            sys.stdout.write(u"\u001b[%dD" % (len(data)+1))
+            sys.stdout.write(u"\u001b[%dA" % (len(data)+1))
         sys.stdout.flush()
         currentmap = new_map
         print '-----------------------------------------MAP: %d' % i

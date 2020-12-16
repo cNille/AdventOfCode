@@ -26,10 +26,10 @@ while turn < X:
         print time() - start, turn
         start = time()
 
-    if len(spoken[prev]) <= 1:
+    if len(spoken[prev]) == 1:
         prev = 0
     else:
-        prev = spoken[prev][-1] - spoken[prev][-2]
+        prev = turn-1 - spoken[prev][-2]
     if prev not in spoken:
         spoken[prev] = deque(maxlen=2)
     spoken[prev].append(turn)

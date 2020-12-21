@@ -1,7 +1,8 @@
+import numpy as np
 from collections import defaultdict
 import math
-lines = [x.strip() for x in open('20.input', 'r').readlines()]
 lines = [x.strip() for x in open('20.test', 'r').readlines()]
+lines = [x.strip() for x in open('20.input', 'r').readlines()]
 lines.append('')
 
 tiles = []
@@ -24,8 +25,6 @@ while '' in lines:
     tiles.append(tile_sides)
 
 connections = defaultdict(list)
-
-result = 1
 edge_tiles = []
 corner_ids = []
 for tile in tiles:
@@ -60,6 +59,7 @@ print("Solution part 1: %d" % result)
 print("----------------")
 
 directions = ['U', 'R', 'D', 'L']
+flipped_directions = ['U', 'L', 'D', 'R']
 opposite = {
     'U': 'D', 'R': 'L',
     'D': 'U', 'L': 'R',
@@ -67,6 +67,10 @@ opposite = {
 
 square_size = int(math.sqrt(len(tiles)))
 top_left = corner_ids[0] # Id
+top_left = corner_ids[3] # Id
+top_left = corner_ids[1] # Id test
+top_left = corner_ids[2] # Id real 
+
 placed_tiles = {top_left: (0,0)}
 tile_positions = {(0,0): top_left}
 current_id = top_left
@@ -98,6 +102,10 @@ tile_positions, placed_tiles = fill_line((square_size-1,0), lambda x: (square_si
 # Right column
 tile_positions, placed_tiles = fill_line((0,square_size-1), lambda x: (x,square_size-1), tile_positions, placed_tiles)
 
+for tp in tile_positions:
+    print(tp, tile_positions[tp])
+print(tile_positions)
+
 # Place middle pieces
 for y in range(1, square_size-1):
     for x in range(1, square_size-1):
@@ -113,118 +121,113 @@ for y in range(1, square_size-1):
 #    print(tp, tile_positions[tp])
 #print(tile_positions)
 
-print(connections)
+print('-------------')
+print('Connections')
+for c in connections:
+    if len(connections[c]) > 0:
+        print(c, connections[c])
+print('-------------')
+
+# Assemble image
 image = []
 for y in range(0, square_size):
     image.append([tile_positions[(y,x)] for x in range(0, square_size)])
     print(image[-1])
 
-flip_img = []
-for y in range(0, square_size):
-    row = []
-    for x in range(0, square_size):
-        neighbours = get_neighbours(tile_positions[(y, x)]) 
-        flipped = len([1 for n in neighbours if n[2] == 'flipped'])
-        row.append(flipped) 
-    #print(row)
-
-
-prev_id = tile_positions[(0,0)] 
-flip_grid = {(0,0): False} 
-is_flipped = False
-
-
-
+# Flip images
+first_is_flipped = False
+flip_grid = {(0,0): first_is_flipped} 
+is_flipped = first_is_flipped
 for y in range(1, square_size):
     above = image[y-1][0]
     connection = [n for n in get_neighbours(above) if n[0] == image[y][0]][0]
     if connection[2] == 'flipped':
         is_flipped = not is_flipped
-    flip_grid[(y,0)] = is_flipped
+    flip_grid[(y, 0)] = is_flipped
 
-
-is_flipped = False
+is_flipped = first_is_flipped
+is_prev_flipped = is_flipped 
 for y in range(0, square_size):
     for x in range(1, square_size):
         left_of = image[y][x-1]
         connection = [n for n in get_neighbours(left_of) if n[0] == image[y][x]][0]
 
         is_prev_flipped = flip_grid[(y, x-1)]
-        is_flipped = (is_prev_flipped and connection[2] == 'unflipped') or (not is_prev_flipped and connection[2] == 'flipped')
+        current_flipped = connection[2] == 'flipped'
+        is_flipped = is_prev_flipped ^ current_flipped
         flip_grid[(y,x)] = is_flipped
 
+print('---------')
+print('Flip schema')
 for y in range(square_size):
     row = ['F' if flip_grid[(y,x)] else '0' for x in range(square_size)] 
-    #print(row)
+    print(row)
 
+print('---------')
+print('Rotate schema')
+connection = [n for n in get_neighbours(image[0][1]) if n[0] == image[0][0]][0]
+rotation = (directions.index('U') - directions.index(connection[1]) + 1) % 4
 
-rotation_grid = {} 
-for y in range(square_size):
-    connection = [n for n in get_neighbours(image[y][1]) if n[0] == image[y][0]][0]
-    rotation = (directions.index(connection[1]) + 1 ) % 4
-    rotation_grid[(y,0)] = rotation
+rotation_grid = {(0,0): rotation} 
+for y in range(1, square_size):
+    above = image[y-1][0]
+    current = image[y][0]
+    connection = [n for n in get_neighbours(above) if n[0] == current][0]
+    is_flipped = flip_grid[(y, 0)]
+    ds = flipped_directions if is_flipped else directions
+
+    rotation = (ds.index('U') - ds.index(connection[1]) ) % 4
+    #print(y, current, connection[1], rotation)
+    rotation_grid[(y, 0)] = rotation
 
 for y in range(square_size):
     for x in range(1,square_size):
         connection = [n for n in get_neighbours(image[y][x-1]) if n[0] == image[y][x]][0]
-        rotation = (directions.index(connection[1]) - 1) % 4 
+        ds = flipped_directions if flip_grid[(y, x)] else directions
+        rotation = (ds.index('L') - ds.index(connection[1])) % 4 
         rotation_grid[(y,x)] = rotation
 
 for y in range(square_size):
     row = [rotation_grid[(y,x)] for x in range(square_size)] 
     print(row)
 
-import numpy as np
 whole_image = {}
 for y, row in enumerate(image):
     for x, tile_id in enumerate(row):
         rotate = rotation_grid[(y,x)]
         flip = flip_grid[(y,x)]
-        print(rotate, flip)
         tile = tile_inner[tile_id]
         tile_size = len(tile[0])
-        #print(tile_id)
         tile = [[1 if ch == '#' else 0 for ch in line] for line in tile]
 
         tile = np.array(tile, int)
         if flip:
-            tile = np.flip(tile, 0)
-            rotate = (rotate + 2)%4
-            
-        #for t in tile:
-        #    print(t)
-
+            tile = np.flip(tile, 1)
+            rotate = rotate + 2
 
         tile = np.rot90(tile, -rotate)
-        #print('...')
-        #for t in tile:
-            #print(t)
 
         for a in range(tile_size):
             for b in range(tile_size):
                 whole_image[(y*tile_size + a, x*tile_size + b)] = tile[a][b]
+print('---------')
         
-        
-
 whole_size = tile_size * square_size 
-#print(whole_size)
 
 img = []
+from textwrap import wrap
 for y in range(whole_size):
     row = []
     for x in range(whole_size):
         ch = '#' if whole_image[(y,x)] == 1 else '.'
         row.append(ch)
-    img.append("".join(row))
-
-for line in img:
-    print(line)
-        
+    img.append(row)
 
 # Monster coordinates
-#   .#...#.###...#.##.O#..
-#   O.##.OO#.#.OO.##.OOO##
-#   #O.#O#.O##O..O.#O##.##
+#    012345678901234567890
+#   0.#...#.###...#.##.O#..
+#   1O.##.OO#.#.OO.##.OOO##
+#   2#O.#O#.O##O..O.#O##.##
         
 monster = [
     (0, 18),
@@ -243,48 +246,54 @@ monster = [
     (2, 13),
     (2, 16),
 ]
-        
 
-for y in range(whole_size - 3 - 1):
-    for x in range(whole_size - 20 - 1):
-        relative_coordinates = [(y+a, x+b) for a,b in monster]
-        rel = [img[y][x] for (y,x) in relative_coordinates]
-        if x == 2 and y == 2:
-            print(relative_coordinates)
-            print(rel)
-        rel = [r == '#' for r in rel]
-        found = all(rel)
-        if x == 2 and y == 2:
-            print(rel)
-        if found:
-            print(rel)
-            print('Found', x,y)
-print(whole_size)
-print(tile_size)
-exit()
+def print_img(img_arr):
+    print('====')
+    for y in img_arr:
+        print("".join(y))
+    print('----')
+
+monster_pos = set()
+def find(img):
+    global monster_pos
+    found = []
+    for y in range(whole_size - 19):
+        for x in range(whole_size - 2):
+            relative_coordinates = [(x+a, y+b) for a,b in monster]
+            #print((x,y), relative_coordinates[8])
+
+            rel = [img[j][i] for (i,j) in relative_coordinates]
+            rel = [r == '#' for r in rel]
+            if all(rel):
+                found.append((x,y))
+                for r in relative_coordinates:
+                    monster_pos.add(r)
+                #print('Found', x,y)
+    return found
 
 
-# .####...###.#......###..
-# #####..#.#.#.....#.###..
-# .#.#...#...#..#.#.##..#.
-# #.#.##.###..##.######..#
-# ..##.####.####..#..####.
-# ...#.#..###.#.#...#.#..#
-# #.##.#..#.####...####.##
-# .###.##.#..#.##..#.#.###
-# #.####.##..#.##..##...#.
-# ##...#..#.##.#..##..##..
-# ..#.##...#.#.##..#...#..
-# ....#.##...#...#####...#
-# ..##.##...##..##..#.#.#.
-# #...#.....#.####..#.#.#.
-# .#.##...#.####.##.#...##
-# #.###.#..#..###..##.##.#
-# #.###.......##.#..#..###
-# .###.###..###.#.####.##.
-# ..##.#..##..#.######...#
-# #.#..##.#.########....##
-# #.#####...#.#.#.###.###.
-# #....##.###.###.####.###
-# #...#....##.###.#.#..#.#
-# #..###....######..#.##..
+tot_found = 0
+for i in range(4):
+    new_img = np.rot90(img, -i)
+    found = find(new_img)
+    tot_found += len(found)
+    print('unflipped', i, ':', len(found))
+
+for i in range(4):
+    new_img = np.rot90(np.flip(img,1), -i)
+    found = find(new_img)
+    tot_found += len(found)
+    print('flipped  ', i, ':', len(found))
+
+#for i in range(4):
+#    new_img = np.rot90(np.flip(img,0), -i)
+#    found = find(new_img)
+#    tot_found += len(found)
+#    print('flipped  ', i, ':', len(found))
+
+tot = 0
+for row in img:
+    tot += len([ch for ch in row if ch == '#'])
+
+result = tot - ((1+tot_found) * len(monster))
+print("Solution part 2:", result)

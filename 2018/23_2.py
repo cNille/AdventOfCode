@@ -1,6 +1,12 @@
 import re
 # Part 2
 
+# https://www.reddit.com/r/adventofcode/comments/a8s17l/2018_day_23_solutions/ecdbux2?utm_source=share&utm_medium=web2x&context=3
+# Using Z3
+
+# https://www.reddit.com/r/adventofcode/comments/a8s17l/2018_day_23_solutions/ecdqzdg?utm_source=share&utm_medium=web2x&context=3
+# Using overlaps and sorting edges
+
 # Load data
 DATA = [line.strip() for line in open('23.in', 'r').readlines()]
 

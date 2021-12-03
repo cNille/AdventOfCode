@@ -8,20 +8,18 @@ lines = [x.strip() for x in f.readlines()]
 def nth_most_common(lines, n):
     half = float(len(lines)) / 2.0
     nth_bit = [x[n] for x in lines]
-    ones = sum(map(int, nth_bit))
-    return '1' if ones >= half else '0' 
+    return '1' if nth_bit.count('1') >= half else '0' 
 
 def nth_least_common(lines, n):
     half = float(len(lines)) / 2.0
     nth_bit = [x[n] for x in lines]
-    ones = sum(map(int, nth_bit))
-    return '0' if ones >= half else '1' 
+    return '0' if nth_bit.count('1') >= half else '1' 
 
 # --------------
 # Part 1
 
 def part1():
-    bits_count=len(lines[0])
+    bits_count = len(lines[0])
     gamma = ''.join([
         nth_most_common(lines, i) 
         for i in range(bits_count)
@@ -32,16 +30,14 @@ def part1():
         for i in range(bits_count)
     ])
 
-    gamma = int(gamma, 2) 
-    epsilon = int(epsilon, 2) 
-    return epsilon * gamma
+    return int(gamma, 2) * int(epsilon, 2)
 print("Solution part1: %d" % part1())
 
 # --------------
 # Part 2
 
 def find_by(lines, filter_function):
-    bits_count= len(lines[0])
+    bits_count = len(lines[0])
     filtered = lines
     for i in range(bits_count):
         filtered = [
@@ -53,8 +49,6 @@ def find_by(lines, filter_function):
     return int(filtered[0], 2)
 
 def part2():
-    bits_count=len(lines[0])
-    ogr = csr = lines
     ogr = find_by(lines, nth_most_common)
     csr = find_by(lines, nth_least_common)
     return ogr * csr

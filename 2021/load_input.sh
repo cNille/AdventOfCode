@@ -4,10 +4,10 @@ day=`date '+%d'`
 # Get cookie from adventofcode.com
 COOKIE=""
 
-sleep 5
+sleep 2
 
 curl\
   --silent\
   -H "Cookie: $COOKIE"\
-  -o $day.input\
+  -o /Users/nille/aoc/$YEAR/$day.input\
   https://adventofcode.com/$YEAR/day/${day#0}/input 

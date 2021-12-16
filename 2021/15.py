@@ -51,7 +51,7 @@ def quickest_path(cave):
             score, pos = step
             if pos in cache and cache[pos] <= step[0]:
                 continue
-            heuristic = score + (ROWS - pos[1]) + (COLS - pos[0])
+            heuristic = score + (ROWS - pos[1]) * 1.5 + (COLS - pos[0]) * 1.5
             queue.append((heuristic, score, pos))
     last_pos = (COLS, ROWS)
     result = cache[last_pos]

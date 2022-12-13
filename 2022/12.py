@@ -1,9 +1,10 @@
 print(chr(27)+'[2j')
 print('\033c')
 f = open('12.test', 'r')
-#f = open('12.input', 'r')
+f = open('12.input', 'r')
 lines = [x.strip() for x in f.readlines()]
 
+from time import sleep
 print("Day 12")
 
 mtx = []
@@ -22,7 +23,7 @@ for y,line in enumerate(lines):
             end = (x,y)
             level = "z"
             # part2
-            pos = (x,y)
+            # pos = (x,y)
         row.append(ord(level) - 97)
     mtx.append(row)
 
@@ -77,10 +78,10 @@ while len(queue) > 0:
     visited.add((x,y))
     print("Q: %d, visited: %d" % (len(queue), len(visited)))
 
-    # part1
-    # if end == (x,y):
     # part2
-    if mtx[y][x] == 0:
+    #if mtx[y][x] == 0:
+    # part1
+    if end == (x,y):
         finished = True
         end = (x,y)
         break

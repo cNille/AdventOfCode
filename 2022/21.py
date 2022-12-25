@@ -8,7 +8,6 @@ print("Day 21")
 def game(default=0):
     registers = {}
     values = {}
-    dependencies = {}
     root_deps = ('none', 'none')
     for l in lines:
         r, op = l.split(': ')
@@ -21,9 +20,6 @@ def game(default=0):
                 values[r] = int(op)
         else:
             left, operator, right = ops
-            assert(left not in dependencies and right not in dependencies)
-            dependencies[left] = r
-            dependencies[right] = r
             if r == 'root':
                 root_deps = (left,right)
 
@@ -47,6 +43,7 @@ def game(default=0):
             else:
                 print("Unrecog:", operator)
                 exit()
+    print(values)
     return values, root_deps
 
 values, (l,r) = game()

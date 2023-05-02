@@ -1,16 +1,10 @@
 print(chr(27)+'[2j')
 print('\033c')
-from itertools import permutations
-import json
+from functools import cache
 import math
 f = open('24.test', 'r')
 f = open('24.input', 'r')
 data = [x.strip() for x in f.readlines()]
-
-def get(registers, a):
-    if a in registers:
-        return registers[a]
-    return int(a)
 
 def round(value):
     return math.floor(value) if value > 0 else math.ceil(value)
@@ -31,99 +25,101 @@ values = [
     (26,-10, 13),
 ]
 
-def calc(registers, w, v1, v2, v3):
-    registers['w'] = w
-    registers['x'] = 1 if ((registers['z'] % 26) + v2) != w else 0
-    registers['z'] = round(registers['z'] / v1)
-    registers['z'] = registers['z'] * ((25 * registers['x']) + 1) 
-    registers['y'] = (w + v3) * registers['x']
-    registers['z'] = registers['z'] + registers['y']
-    return registers
+@cache
+def calc(registers, w, A, B, C):
+    registers = list(registers)
+    registers[3] = w
+    registers[0] = 1 if ((registers[2] % 26) + B) != w else 0
+    registers[2] = round(registers[2] / A)
+    registers[2] = registers[2] * ((25 * registers[0]) + 1) 
+    registers[1] = (w + C) * registers[0]
+    registers[2] = registers[2] + registers[1]
+    return tuple(registers)
 
-valid_zeros = [0]
-for i in range(len(values)):
-    print('-- Testing %d' % i)
-    new_zeros = []
-    for digit in range(1,10):
-        for z in range(10000):
-            a,b,c = values[(i + 1) * -1]
-            registers = { "x": 0, "y": 0, "z": z, "w": 0 }
-            new_reg = calc(registers, digit, a, b, c)
-            if new_reg['z'] in valid_zeros:
-                print("Digit %d , z %d : %d" % (digit, z, new_reg['z']))
-                new_zeros.append(z)
-    valid_zeros = new_zeros
+digit_calc = [
+    (1,  12, 7),  # ✅
+    (1,  11, 15),# ✅
+    (1,  12, 2),# ✅
+    (26, -3, 15),# ✅
+    (1,  10, 14),# ✅
+    (26, -9, 2),# ✅
+    (1,  10, 15),# ✅
+    (26, -7, 1),# ✅
+    (26,-11, 15),# ✅
+    (26, -4, 15),# ✅
+    (1,  14, 12),
+    (1,  11, 2),
+    (26, -8, 13),
+    (26,-10, 13),
+]
+# x = 0 if ((z % 26) + B) == w else 1 
+# z = ( (z / A) * ( 25 * x + 1 ) ) + x * (w + C) 
 
-def monad(i):
-    copy_i = [ch for ch in i]
-    i = [ch for ch in i]
-    registers = {
-        "x": 0,
-        "y": 0,
-        "z": 0,
-        "w": 0,
-    }
-    verbose = False
+# A = 1, B = 14, C = 12
+# x = 0 if ((z % 26) + B) == w else 1 
+# z = ( (z / A) * ( 25 * x + 1 ) ) + x * (w + C) 
 
+# 1:  (w1+7) 
+# 2:  (w1+7)*26 + (w2+15)
+# 3:  (w1+7)*26*26 + (w2+15)*26 + (w3+2)
+# 4:  (w1+7)*26 + (w2+15)
+# 5:  (w1+7)*26*26 + (w2+15)*26 + (w5+14)
+# 6:  (w1+7)*26 + (w2+15)
+# 7:  (w1+7)*26*26 + (w2+15)*26 + (w7+15)
+# 8:  (w1+7)*26 + (w2+15) 
+# 9:  (w1+7)
+# 10: 0 
+# 11: (w11+12)
+# 12: (w11+12)*26 + (w12+2)
+# 13: (w12+2)
+
+# w10 = w1 + 3
+# w9 = w2 + 4
+# w4 = w3 - 1
+# w6 = w5 + 5 
+# w8 = w7 + 8
+# w13 = w12 - 6
+
+# Highest: 65984919997939 
+# Lowest:  11211619541713  
+
+def monad(nbr):
     # Input 1
-    w1 = int(i.pop(0))
-    registers['w'] = int(w1)
-    registers['x'] = 1
-    registers['y'] = 0
-    registers['z'] = registers['w'] + 7
-    verbose and print('Registers 1:', registers)
+    z = 0
+    w = int(nbr[0])
+    registers = (0, 0, z, int(w))
+    for idx in range(len(nbr)):
+        w = int(nbr[0])
+        registers = (0, 0, z, int(w))
+        a,b,c = digit_calc[idx]
+        registers = calc(registers, w, a, b, c)
+        z = registers[2]
+        nbr = nbr[1:]
 
-    registers = calc(registers, int(i.pop(0)), 1,  11, 15)
-    verbose and print('R 2:', registers)
-    registers = calc(registers, int(i.pop(0)), 1,  12, 2)
-    verbose and print('R 3:', registers)
-    registers = calc(registers, int(i.pop(0)), 26, -3, 15)
-    verbose and print('R 4:', registers)
-    registers = calc(registers, int(i.pop(0)), 1,  10, 14)
-    verbose and print('R 5:', registers)
-    registers = calc(registers, int(i.pop(0)), 26, -9, 2)
-    verbose and print('R 6:', registers)
-    registers = calc(registers, int(i.pop(0)), 1,  10, 15)
-    verbose and print('Registers 7:', registers)
-    registers = calc(registers, int(i.pop(0)), 26, -7, 1)
-    verbose and print('Registers 8:', registers)
-    registers = calc(registers, int(i.pop(0)), 26,-11, 15)
-    verbose and print('Registers 9:', registers)
-    registers = calc(registers, int(i.pop(0)), 26, -4, 15)
-    verbose and print('Registers 10:', registers)
-    registers = calc(registers, int(i.pop(0)), 1,  14, 12)
-    verbose and print('Registers 11:', registers)
-    registers = calc(registers, int(i.pop(0)), 1,  11, 2)
-    verbose and print('Registers 12:', registers)
-    registers = calc(registers, int(i.pop(0)), 26, -8, 13)
-    verbose and print('Registers 13:', registers)
-    registers = calc(registers, int(i.pop(0)), 26,-10, 13)
-    verbose and print('Registers 14:', registers)
-    return (is_valid, registers)
+    is_valid = z == 0
+    return is_valid, registers
 
+# I was close enough so i could just iterate from my guesses
 is_valid = False
-nbr = 99978825281377
+nbr = 65984919997939
+nbr = 11211619541713 
 count = 0
-
-# s = '12345678912345'
-# is_valid, regs = monad(s)
-# print('Checking %s, zvalue: %d' % (s, regs['z']))
-# # s = '9'
-# # for i in [9,8,7,6,5,4,3,2,1]:
-# #     s = str(i) + '123127543'
-# #     is_valid, regs = monad(s)
-# #     print('Checking %s, zvalue: %d' % (s, regs['z']))
-# exit()
-
 while not is_valid:
-    nbr -= 1
     s = str(nbr)
     if '0' in s:
+        nbr += 1
         continue
     count += 1
     is_valid, regs = monad(s) 
+    if is_valid:
+        print('Found %s, zvalue: %d' % (s, regs[2]))
+        break
 
-    if count % 100000 == 0:
+    if count % 100 == 0:
         print('Checking %s' % s, regs)
+    nbr += 1
 
 print('Number %d is valid' % (nbr))
+
+# Too low
+# 7091892073

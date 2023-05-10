@@ -8,7 +8,6 @@ for d in data:
     fly = int(d[6])
     rest = int(d[-2])
 
-    print name, v, fly, rest 
     deers[name] = [v, fly, rest]
 
 time = 2503
@@ -27,10 +26,24 @@ for d in deers:
     distance = whole_rounds * (fly*v) + part_round
     max_dist = max(max_dist, distance)
 
-print "Part 1: %d" % max_dist
+print("Part 1: %d" % max_dist)
 
 # Part 2
-# for i in range(1,2504):
-#     print i
-#     for d in deers:
-        
+distances = {}
+points = {}
+for i, _ in enumerate(deers):
+    distances[i] = 0
+    points[i] = 0
+
+for i in range(0,2503):
+    for idx, d in enumerate(deers):
+        [v, fly, rest] = deers[d]
+        round_time = fly + rest
+        if i % round_time < fly:
+            distances[idx] += v
+    max_dist = (0,0)
+    for d in distances:
+        if distances[d] > max_dist[1]:
+            max_dist = (d, distances[d])
+    points[max_dist[0]] += 1
+print("Part 2: %d" % max(points.values()))

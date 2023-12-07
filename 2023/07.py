@@ -33,7 +33,7 @@ def type_from_counts(counts):
         return 'five_of_a_kind' # 6
     elif 4 in counts.values():
         return 'four_of_a_kind' # 5
-    elif 2 in counts.values() and 3 in counts.values():
+    elif 3 in counts.values() and 2 in counts.values():
         return 'full_house' # 4
     elif 3 in counts.values():
         return 'three_of_a_kind' # 3

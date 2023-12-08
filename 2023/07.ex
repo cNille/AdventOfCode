@@ -113,33 +113,36 @@ defmodule AdventOfCode do
       else
         j_count = Enum.count(frequencies, fn {k, _} -> k == "J" end)
 
-        frequencies
-        |> Enum.map(fn {k, _} ->
-          if k != "J" do
-            new_freq =
-              Enum.map(frequencies, fn {k2, v2} ->
-                cond do
-                  k2 == "J" ->
-                    {k2, 0}
+        list =
+          frequencies
+          |> Enum.map(fn {k, _} ->
+            if k != "J" do
+              new_freq =
+                Enum.map(frequencies, fn {k2, v2} ->
+                  cond do
+                    k2 == "J" ->
+                      {k2, 0}
 
-                  k2 == k ->
-                    {k2, v2 + j_count}
+                    k2 == k ->
+                      {k2, v2 + j_count}
 
-                  true ->
-                    {k2, v2}
-                end
-              end)
+                    true ->
+                      {k2, v2}
+                  end
+                end)
 
-            hand_type = type_from_frequencies(new_freq)
-            hand_value = Enum.find_index(types, &(&1 == hand_type))
-            hand_value
-          else
-            hand_type = type_from_frequencies(frequencies)
-            hand_value = Enum.find_index(types, &(&1 == hand_type))
-            hand_value
-          end
-        end)
-        |> Enum.max()
+              hand_type = type_from_frequencies(new_freq)
+              hand_value = Enum.find_index(types, &(&1 == hand_type))
+              hand_value
+            else
+              hand_type = type_from_frequencies(frequencies)
+              hand_value = Enum.find_index(types, &(&1 == hand_type))
+              hand_value
+            end
+          end)
+
+        IO.inspect(bbv)
+        Enum.max(list)
       end
 
     IO.puts("hand: #{hand} bid: #{bid} value: #{value}")

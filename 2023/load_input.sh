@@ -9,6 +9,6 @@ sleep 5
 
 curl\
   --silent\
-  -H "Cookie: $COOKIE"\
+  -H "Cookie: session=$COOKIE"\
   -o /Users/nille/aoc/$YEAR/$day.input\
   https://adventofcode.com/$YEAR/day/${day#0}/input 

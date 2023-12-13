@@ -8,19 +8,6 @@ patterns = [p.strip().split('\n') for p in patterns]
 f.close()
 
 
-def rotate(pattern):
-    width = len(pattern[0])
-    height = len(pattern)
-    p2 = []
-    length = len(pattern[0])
-    for i in range(width):
-        row = ''
-        for j in range(height):
-            row += pattern[j][length - i - 1]
-        p2.append(row)
-    return p2
-
-
 def find_vertical_mirror(pattern, smudge_allow):
     mirror_idx = 1
     smudge_count = 0
@@ -39,13 +26,17 @@ def find_vertical_mirror(pattern, smudge_allow):
             for i in range(len(c1)):
                 if c1[i] != c2[i]:
                     smudge_count += 1
-                    # break
         if smudge_count == smudge_allow:
             break
         mirror_idx += 1
     if smudge_count == smudge_allow:
         return mirror_idx
     return -1
+
+
+# Use zip to transpose the matrix
+def rotate(pattern):
+    return list(zip(*pattern))
 
 
 def find_horisontal_mirror(pattern, smudge_allow):

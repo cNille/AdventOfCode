@@ -1,51 +1,50 @@
 print(chr(27)+'[2j')
 print('\033c')
-#f = open('05.input', 'r')
+f = open('05.input', 'r')
 f = open('05.test', 'r')
 rows = [x for x in f.readlines()]
 
-is_columns = True
-
-columns = []
-mtx1 = []
-mtx2 = []
+crate_rows = []
+mtx = []
 instr = []
-max_width = 0
+is_columns = True
 for line in rows:
     if line.strip() == "":
         is_columns = False
         continue
     if is_columns:
-        columns.append(line)
-        try:
-            width = int(line.strip()[-1])
-            if width > 0:
-                max_width = width
-        except:
-            continue
+        crate_rows.append(line)
     else:
         instr.append(line)
 
-for i in range(max_width):
-    mtx1.append([])
-    mtx2.append([])
+for row in crate_rows[:-1]:
+    # Get each 4th char, with offset 1.
+    every = 4
+    offset = 1
+    start = offset
+    end = len(row) + offset
+    for i in range(start, end, every):
+        column_idx = int(i/4)
+        # Add a new column if needed.
+        if column_idx >= len(mtx):
+            mtx.append([])
 
-for column in columns[:-1]:
-    length = len(column)
-    column_width = int((length - 3) / 4) + 1
-    for i in range(0, column_width):
-        col = column[i*4:i*4+3]
-        col = col[1:-1]
-        if col != ' ':
-            mtx1[i].insert(0, col)
-            mtx2[i].insert(0, col)
+        # Get crate
+        crate = row[i]
+
+        # If crate not empty, add it to the stack.
+        if crate != ' ':
+            mtx[column_idx].insert(0, crate)
+
+print(mtx)
+
 
 def do_instr(instr, mtx, reverse=False):
     for i in instr:
         _, nbr, _, src, _, dest = i.split(' ')
         nbr = int(nbr)
-        src = int(src) -1 
-        dest = int(dest) -1
+        src = int(src) - 1
+        dest = int(dest) - 1
 
         poped = []
         for _ in range(nbr):
@@ -59,11 +58,12 @@ def do_instr(instr, mtx, reverse=False):
 
     res = ""
     for m in mtx:
-        res +=m[-1]
+        res += m[-1]
     return res
 
-part1 = do_instr(instr, mtx1)
+
+part1 = do_instr(instr, [x.copy() for x in mtx])
 print("Solution part 1:", part1)
 
-part2 = do_instr(instr, mtx2, True)
+part2 = do_instr(instr, [x.copy() for x in mtx], True)
 print("Solution part 2:", part2)

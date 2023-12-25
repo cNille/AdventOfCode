@@ -4,3 +4,6 @@
 **/*.input
 
 .env
+
+.aoc_tiles/cache
+.aoc_tiles/session.cookie

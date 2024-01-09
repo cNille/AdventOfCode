@@ -4,7 +4,7 @@
 <h1 align="center">
   2023 - 50 ⭐
 </h1>
-<a href="2023/01.py">
+<a href="2023/01.ex">
   <img src=".aoc_tiles/tiles/2023/01.png" width="161px">
 </a>
 <a href="2023/02.py">

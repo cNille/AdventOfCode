@@ -7,7 +7,7 @@
 <a href="2023/01.ex">
   <img src=".aoc_tiles/tiles/2023/01.png" width="161px">
 </a>
-<a href="2023/02.py">
+<a href="2023/02.ex">
   <img src=".aoc_tiles/tiles/2023/02.png" width="161px">
 </a>
 <a href="2023/03.py">
@@ -397,7 +397,7 @@
 <a href="2018/day_01.py">
   <img src=".aoc_tiles/tiles/2018/01.png" width="161px">
 </a>
-<a href="2018/day_02.py">
+<a href="2018/02.ex">
   <img src=".aoc_tiles/tiles/2018/02.png" width="161px">
 </a>
 <a href="2018/day_03.py">

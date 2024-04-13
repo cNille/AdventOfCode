@@ -36,6 +36,3 @@ def part2():
 
 result2 = part2()
 print("Part 2 solution: %d" % result2)
-
-
-

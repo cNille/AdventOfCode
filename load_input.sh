@@ -12,3 +12,19 @@ curl\
   -H "Cookie: session=$COOKIE"\
   -o $AOC_DIR/$YEAR/$day.input\
   https://adventofcode.com/$YEAR/day/${day#0}/input 
+
+sleep 5
+
+curl\
+  --silent\
+  -H "Cookie: session=$COOKIE"\
+  -o $AOC_DIR/$YEAR/$day.input\
+  https://adventofcode.com/$YEAR/day/${day#0}/input 
+
+sleep 5
+
+curl\
+  --silent\
+  -H "Cookie: session=$COOKIE"\
+  -o $AOC_DIR/$YEAR/$day.input\
+  https://adventofcode.com/$YEAR/day/${day#0}/input 

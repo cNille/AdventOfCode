@@ -1,175 +1,136 @@
 print(chr(27)+'[2j')
 print('\033c')
 f = open('04.input', 'r')
-f = open('04.test', 'r')
+#f = open('04.test', 'r')
 lines = [x.strip() for x in f.readlines()]
 
-for line in lines:
-    print(line)
+verbose = False
 
-#def pprint():
-#    print('Found', len(found))
-#    for y in range(len(lines)):
-#        line = ''
-#        for x in range(len(lines[0])):
-#            if (x,y) in found:
-#                line += "X"
-#            else:
-#                line += "."
-#        print(line)
+
+for line in lines:
+    if verbose:
+        print(line)
+
+def pprint(found):
+    if not verbose:
+        return
+    print('---')
+    for y in range(len(lines)):
+        line = ''
+        for x in range(len(lines[0])):
+            if (x,y) in found:
+                line += lines[y][x] 
+            else:
+                line += "."
+        print(line)
+
+
+matrixes_part1 = [
+    [
+        'XMAS',
+    ],
+    [
+        'SAMX',
+    ],
+    [
+        'X',
+        'M',
+        'A',
+        'S',
+    ],
+    [
+        'S',
+        'A',
+        'M',
+        'X',
+    ],
+    [
+        'X...',
+        '.M..',
+        '..A.',
+        '...S',
+    ],
+    [
+        '...X',
+        '..M.',
+        '.A..',
+        'S...',
+    ],
+    [
+        '...S',
+        '..A.',
+        '.M..',
+        'X...',
+    ],
+    [
+        'S...',
+        '.A..',
+        '..M.',
+        '...X',
+    ],
+]
+
+matrixes_part2 = [
+    [
+        'M.M',
+        '.A.',
+        'S.S',
+    ],
+    [
+        'S.M',
+        '.A.',
+        'S.M',
+    ],
+    [
+        'S.S',
+        '.A.',
+        'M.M',
+    ],
+    [
+        'M.S',
+        '.A.',
+        'M.S',
+    ],
+]
+
+def solve(matrixes):
+    total = 0
+    found = []
+    for m in matrixes:
+        count = 0
+        if verbose:
+            print('-------')
+            for row in m:
+                print(row)
+        for y in range(len(lines) - len(m)+1):
+            for x in range(len(lines[0]) - len(m[0])+1):
+                matches = True
+
+                for my in range(len(m)):
+                    for mx in range(len(m[0])):
+                        if m[my][mx] == '.':
+                            continue
+                        if lines[y+my][x+mx] != m[my][mx]:
+                            matches = False
+
+                if matches:
+                    count += 1
+
+                    for my in range(len(m)):
+                        for mx in range(len(m[0])):
+                            if m[my][mx] != '.':
+                                found.append((x+mx, y+my))
+        total += count
+        if verbose:
+            print("Found %d (%d)"% (count, total))
+    return total, found
 
 # Part 1
-count = 0
-found = []
-for y in range(len(lines)):
-    for x in range(len(lines[0])-3):
-        if (
-            lines[y][x] == 'X' and
-            lines[y][x+1] == 'M' and
-            lines[y][x+2] == 'A' and
-            lines[y][x+3] == 'S'
-            ):
-            count += 1
-            found.append((x,y))
+count, found = solve(matrixes_part1)
+pprint(found)
+print("Solution part1:", count)
 
-for y in range(len(lines)):
-    for x in range(3,len(lines[0])):
-        if (
-            lines[y][x] == 'X' and
-            lines[y][x-1] == 'M' and
-            lines[y][x-2] == 'A' and
-            lines[y][x-3] == 'S'
-            ):
-            count += 1
-            found.append((x,y))
-
-for y in range(len(lines)-3):
-    for x in range(len(lines[0])):
-        if (
-            lines[y][x] == 'X' and
-            lines[y+1][x] == 'M' and
-            lines[y+2][x] == 'A' and
-            lines[y+3][x] == 'S'
-            ):
-            count += 1
-            found.append((x,y))
-
-for y in range(3,len(lines)):
-    for x in range(len(lines[0])):
-        if (
-            lines[y][x] == 'X' and
-            lines[y-1][x] == 'M' and
-            lines[y-2][x] == 'A' and
-            lines[y-3][x] == 'S'
-            ):
-            count += 1
-            found.append((x,y))
-
-for y in range(0,len(lines)-3):
-    for x in range(0,len(lines[0])-3):
-        # Diagonal down right
-        if (
-            lines[y][x] == 'X' and
-            lines[y+1][x+1] == 'M' and
-            lines[y+2][x+2] == 'A' and
-            lines[y+3][x+3] == 'S'
-            ):
-            count += 1
-            found.append((x,y))
-
-for y in range(len(lines)-3):
-    for x in range(3,len(lines[0])):
-        # Diagonal down left
-        if (
-            lines[y][x] == 'X' and
-            lines[y+1][x-1] == 'M' and
-            lines[y+2][x-2] == 'A' and
-            lines[y+3][x-3] == 'S'
-            ):
-            count += 1
-            found.append((x,y))
-
-for y in range(3,len(lines)):
-    for x in range(len(lines[0])-3):
-        # Diagonal up right
-        if (
-            lines[y][x] == 'X' and
-            lines[y-1][x+1] == 'M' and
-            lines[y-2][x+2] == 'A' and
-            lines[y-3][x+3] == 'S'
-            ):
-            count += 1
-            found.append((x,y))
-
-for y in range(3,len(lines)):
-    for x in range(3,len(lines[0])):
-        # Diagonal up left
-        if (
-            lines[y][x] == 'X' and
-            lines[y-1][x-1] == 'M' and
-            lines[y-2][x-2] == 'A' and
-            lines[y-3][x-3] == 'S'
-            ):
-            count += 1
-            found.append((x,y))
-
-
-print('Solution part 1:', count)
 # Part 2
-count = 0
-found = []
-for y in range(0,len(lines)-2):
-    for x in range(0,len(lines[0])-2):
-        if (
-            lines[y][x] == 'M' and
-            lines[y+2][x] == 'M' and
-            lines[y+1][x+1] == 'A' and
-            lines[y+2][x+2] == 'S' and
-            lines[y][x+2] == 'S'
-            ):
-            count += 1
-            found.append((x,y))
-            found.append((x+1,y+1))
-            found.append((x+2,y+2))
-            found.append((x,y+2))
-            found.append((x+2,y))
-        if (
-            lines[y][x] == 'S' and
-            lines[y+2][x] == 'S' and
-            lines[y+1][x+1] == 'A' and
-            lines[y+2][x+2] == 'M' and
-            lines[y][x+2] == 'M'
-            ):
-            count += 1
-            found.append((x,y))
-            found.append((x+1,y+1))
-            found.append((x+2,y+2))
-            found.append((x,y+2))
-            found.append((x+2,y))
-        if (
-            lines[y][x] == 'M' and
-            lines[y+2][x] == 'S' and
-            lines[y+1][x+1] == 'A' and
-            lines[y+2][x+2] == 'S' and
-            lines[y][x+2] == 'M'
-            ):
-            count += 1
-            found.append((x,y))
-            found.append((x+1,y+1))
-            found.append((x+2,y+2))
-            found.append((x,y+2))
-            found.append((x+2,y))
-        if (
-            lines[y][x] == 'S' and
-            lines[y+2][x] == 'M' and
-            lines[y+1][x+1] == 'A' and
-            lines[y+2][x+2] == 'M' and
-            lines[y][x+2] == 'S'
-            ):
-            count += 1
-            found.append((x,y))
-            found.append((x+1,y+1))
-            found.append((x+2,y+2))
-            found.append((x,y+2))
-            found.append((x+2,y))
-print('Solution part 2:', count)
+count, found = solve(matrixes_part2)
+pprint(found)
+print("Solution part2:", count)

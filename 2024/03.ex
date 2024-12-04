@@ -36,19 +36,13 @@ defmodule AdventOfCode do
     |> Enum.sum()
   end
 
-  def parse_line("", _enabled) do
-    []
-  end
+  def parse_line("", _enabled), do: []
+  def parse_line("do()" <> rest, _enabled), do: parse_line(rest, true)
+  def parse_line("don't()" <> rest, _enabled), do: parse_line(rest, false)
+  def parse_line("mul(" <> rest, enabled), do: try_multiply(rest, enabled)
+  def parse_line(<<_::utf8, rest::binary>>, enabled), do: parse_line(rest, enabled)
 
-  def parse_line("do()" <> rest, _enabled) do
-    parse_line(rest, true)
-  end
-
-  def parse_line("don't()" <> rest, _enabled) do
-    parse_line(rest, false)
-  end
-
-  def parse_line("mul(" <> rest, enabled) do
+  def try_multiply(rest, enabled) do
     case Regex.run(~r/^(\d+),(\d+)\)/, rest) do
       [_, num1, num2] ->
         [
@@ -61,8 +55,6 @@ defmodule AdventOfCode do
     end
   end
 
-  def parse_line(<<_::utf8, rest::binary>>, enabled), do: parse_line(rest, enabled)
-
   def filter_enabled(line) do
     line
     |> Enum.filter(fn
@@ -71,15 +63,8 @@ defmodule AdventOfCode do
     end)
   end
 
-  def multiply_line(line) do
-    line
-    |> Enum.map(&multiply/1)
-    |> Enum.sum()
-  end
-
-  def multiply({:ok, {num1, num2, _}}) do
-    num1 * num2
-  end
+  def multiply_line(line), do: Enum.map(line, &multiply/1) |> Enum.sum()
+  def multiply({:ok, {num1, num2, _}}), do: num1 * num2
 end
 
 AdventOfCode.main_timed()

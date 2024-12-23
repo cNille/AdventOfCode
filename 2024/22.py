@@ -54,68 +54,41 @@ def get_ends(ns):
     ]
 
 
-def get_changes(ns):
+def get_changes(changes, ns):
     ends = get_ends(ns)
-    changes = {}
+    seen = set()
     for i in range(4, len(ends)):
         d1 = ends[i-3] - ends[i-4]
         d2 = ends[i-2] - ends[i-3]
         d3 = ends[i-1] - ends[i-2]
         d4 = ends[i-0] - ends[i-1]
-        if (d1,d2,d3,d4) in changes:
+        nxt = (d1,d2,d3,d4)
+        if nxt in seen:
             continue
-        changes[(d1,d2,d3,d4)] = ends[i]
+        seen.add(nxt)
+        if nxt not in changes:
+            changes[nxt] = 0
+        changes[nxt] += ends[i]
     return changes
 
-# ns = daily(123, 10)
-# ends = get_ends(ns)
-# diff = 0
-# for i, n in enumerate(ns):
-#     end = ends[i]
-#     if i > 0:
-#         diff = ends[i] - ends[i-1]
-#     print(f'{n}\t:{end} ({diff})')
-
 part1 = 0
-all_changes = []
 nodes = set()
+changes = {}
 for i, s in enumerate(secrets):
     ns = daily(s)
     part1 += ns[-1]
     if i % 100 == 0:
         print(f'{i} of {len(secrets)} == {s}: {ns[-1]}')
 
-    changes = get_changes(ns)
+    changes = get_changes(changes, ns)
     nodes.update(changes.keys())
-    all_changes.append(changes)
+
+top = 0
+change = (0,0,0,0)
+for c in changes: 
+    if changes[c] > top:
+        top = changes[c]
+        change = c
 
 print(f'Part1: {part1}')
-
-i = 0
-best_seq = (0,0,0,0)
-best = 0
-#seqs = []
-#for a in range(-9,10):
-#    for b in range(-9,10):
-#        for c in range(-9,10):
-#            for d in range(-9,10):
-#                seqs.append((a,b,c,d))
-#for diff_seq in seqs:
-for diff_seq in nodes:
-    i += 1
-    if i % 1000 == 0:
-        #print(f'{i} of {len(seqs)}: {diff_seq}')
-        print(f'{i} of {len(nodes)}: {diff_seq}')
-
-    price = 0
-    for ch in all_changes:
-        if diff_seq not in ch:
-            continue
-        price += ch[diff_seq]
-    if price >= best:
-        best = price
-        best_seq = diff_seq
-
-print('Iterations:',i)
-print('Best sequence:', best_seq)
-print('Best:', best)
+print(f'Part2: {top}')

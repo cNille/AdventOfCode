@@ -1,0 +1,269 @@
+============== 00 ================
+y00 XOR x00 -> z00
+x00 AND y00 -> r00
+============== 01 ================
+x01 AND y01 -> rkd # and
+y01 XOR x01 -> wmq # xor
+wmq AND r00 -> tfk # w
+tfd _OR rkd -> ktr # r01
+wmq XOR r00 -> z01 # r
+============== 02 ================
+y02 AND x02 -> hjh  # AND
+x02 XOR y02 -> ssd  # XOR
+r01 AND ssd -> cdr  # W
+cdr _OR hjh -> vmr  # r02
+r01 XOR ssd -> z02  # z
+============== 03 ================
+x03 XOR y03 -> fph # XOR
+x03 AND y03 -> wpn # AND
+fph AND r02 -> fnf # W
+fnf _OR wpn -> r03 # r03
+fph XOR r02 -> z03 # z
+============== 04 ================
+y04 AND x04 -> qgm # AND
+y04 XOR x04 -> jth # XOR
+jth AND r03 -> csc # W
+csc _OR qgm -> pvb # r04
+jth XOR r03 -> z04 # z
+============== 37 ================
+x37 AND y37 -> brw # and
+x37 XOR y37 -> cwm # xor
+dpv AND cwm -> tpd # w
+dpv XOR cwm -> z37 # z
+brw _OR tpd -> gcd # r
+============== 38 ================
+y38 AND x38 -> cgh # and
+x38 XOR y38 -> pmd # xor
+gcd AND cgh -> fsb # w
+cgh XOR gcd -> z38 # z
+fsb _OR pmd -> rdj # r ?
+============== 05 ================
+x05 AND y05 -> z05 # AND ? SWAP1
+x05 XOR y05 -> vtn # XOR
+vtn AND pvb -> hvm # W
+tst _OR hvm -> jkm # R05
+pvb XOR vtn -> tst # z ? SWAP1
+============== 06 ================
+x06 AND y06 -> rcg # AND
+y06 XOR x06 -> bmt # XOR
+jkm XOR bmt -> z06 # z
+bmt AND jkm -> pvd # W
+pvd _OR rcg -> pgn # r06
+============== 07 ================
+x07 AND y07 -> bqv # and
+x07 XOR y07 -> qcb # xor
+qcb XOR pgn -> z07 # z
+pgn AND qcb -> vsr # w
+vsr _OR bqv -> dws # r07
+============== 08 ================
+x08 AND y08 -> fqc # and
+y08 XOR x08 -> gjp # xor
+gjp XOR dws -> z08 # z
+gjp AND dws -> djd # w
+djd _OR fqc -> cvd # r08
+============== 09 ================
+x09 AND y09 -> bjj # and
+x09 XOR y09 -> wmk # xor
+vhv _OR bjj -> cds # r09
+wmk XOR cvd -> z09 # z
+cvd AND wmk -> vhv # w
+============== 10 ================
+y10 AND x10 -> kwk # and
+x10 XOR y10 -> vdr # xor
+cds XOR vdr -> z10 # z
+vdr AND cds -> vhr
+kwk _OR vhr -> hkc # r
+============== 11 ================
+x11 AND y11 -> rrr # and
+x11 XOR y11 -> tdd # xor
+hkc XOR tdd -> sps # z ? SWAP2
+hkc AND tdd -> tff
+tff _OR rrr -> z11 # r ? SWAP2
+============== 12 ================
+y12 AND x12 -> bsn # and
+y12 XOR x12 -> fqr # xor
+sps XOR fqr -> z12 # z
+============== 13 ================
+y13 AND x13 -> njs # and
+x13 XOR y13 -> whw # xor
+whw XOR bvk -> z13 # z
+============== 14 ================
+y14 AND x14 -> mck # and 
+y14 XOR x14 -> khg # xor
+vgk XOR khg -> z14 # z
+============== 15 ================
+x15 AND y15 -> fjp # and
+y15 XOR x15 -> wjn # xor
+wjn XOR cqf -> z15 # z
+============== 16 ================
+y16 AND x16 -> ngh # and
+y16 XOR x16 -> rhc # xor
+rhc XOR vfj -> z16
+============== 17 ================
+y17 AND x17 -> rds # and
+x17 XOR y17 -> csp # xor
+jkk XOR csp -> z17 # z
+============== 18 ================
+x18 AND y18 -> sjc # and
+x18 XOR y18 -> pvq # xor
+nfd XOR pvq -> z18 # z
+============== 19 ================
+y19 AND x19 -> kdt # and
+y19 XOR x19 -> sdc # xor
+sdc XOR qdp -> z19 # z
+============== 20 ================
+y20 AND x20 -> mkq # and
+x20 XOR y20 -> nmf # xor
+mnv XOR nmf -> z20 # z
+============== 21 ================
+y21 AND x21 -> dvg # and
+y21 XOR x21 -> qfh # xor
+wbk XOR qfh -> z21 # z
+svw _OR dvg -> gdq
+qfh AND wbk -> svw
+nmf AND mnv -> npm
+njb _OR kdt -> mnv
+npm _OR mkq -> wbk
+============== 22 ================
+y22 AND x22 -> pfs # and
+x22 XOR y22 -> kmw # xor
+kmw XOR gdq -> z22 # z
+============== 23 ================
+y23 AND x23 -> gnj # and
+x23 XOR y23 -> pjg # xor
+pjg XOR kmg -> frt
+gnj _OR frt -> jkv
+kmg AND pjg -> z23   # z
+============== 24 ================
+x24 AND y24 -> cjj # and
+y24 XOR x24 -> dcr # xor
+jkv XOR dcr -> z24 # z
+jkv AND dcr -> qwq
+============== 25 ================
+y25 AND x25 -> mnt # and 
+y25 XOR x25 -> wvk # xor
+ckj XOR wvk -> z25 # z
+============== 26 ================
+x26 AND y26 -> jgh # and
+x26 XOR y26 -> rhf # xor
+cvh XOR rhf -> z26 # z
+============== 27 ================
+y27 AND x27 -> kpd # and
+x27 XOR y27 -> ppk # xor
+ppk XOR qcs -> z27 # z
+============== 28 ================
+x28 XOR y28 -> qhs # xor
+y28 AND x28 -> jfh
+qhs XOR mjq -> z28 # z
+============== 29 ================
+dbp XOR dpt -> z29 # z
+x29 XOR y29 -> dpt # xor
+y29 AND x29 -> tpn
+============== 30 ================
+x30 XOR y30 -> brt # xor
+npt XOR brt -> z30 # z
+x30 AND y30 -> fnw # and
+============== 31 ================
+rhn XOR fjq -> z31 # z
+x31 AND y31 -> bbw # and
+x31 XOR y31 -> fjq # xor
+============== 32 ================
+x32 XOR y32 -> wrh # xor
+y32 AND x32 -> qrk
+vdg XOR wrh -> z32 # z
+============== 33 ================
+y33 AND x33 -> qdm # and
+x33 XOR y33 -> nwp # xor
+pwv AND nwp -> dfd # w
+pwv XOR nwp -> z33 # z
+dfd _OR qdm -> mdn # r
+============== 34 ================
+x34 AND y34 -> jmk # and
+x34 XOR y34 -> chk # xor
+mdn AND chk -> kqd
+mdn XOR chk -> z34 # z
+jmk _OR kqd -> hhc # r
+============== 35 ================
+x35 AND y35 -> fhw # and
+y35 XOR x35 -> cbq # xor
+cbq AND hhc -> fbq # w
+hhc XOR cbq -> z35 # z
+fbq _OR fhw -> wjp # r
+============== 36 ================
+y36 AND x36 -> r36 # and
+x36 XOR y36 -> knv # xor
+wjp AND knv -> fqb # w
+knv XOR wjp -> z36 # z
+fqb _OR r36 -> dpv # r
+============== 39 ================
+wtf XOR rdj -> z39 # z
+rdj AND wtf -> mhg
+y39 XOR x39 -> wtf
+x39 AND y39 -> nwb # and
+============== 40 ================
+y40 XOR x40 -> hnk
+y40 AND x40 -> rsb
+hnk XOR cnh -> z40 # z
+============== 41 ================
+jpf XOR qqj -> z41 # z
+x41 AND y41 -> mtm # and
+x41 XOR y41 -> jpf # xor
+============== 42 ================
+x42 XOR y42 -> hfh # xor
+hfh XOR wgw -> z42 # z
+x42 AND y42 -> nwf # and
+wgw AND hfh -> r42
+============== 43 ================
+x43 AND y43 -> vcb # and
+jjw XOR pwc -> z43 # z
+pwc AND jjw -> frw
+vcb _OR frw -> r43
+nwf _OR r42 -> pwc
+x43 XOR y43 -> jjw # xor
+============== 44 ================
+y44 AND x44 -> nkv
+x44 XOR y44 -> nbf
+r43 AND nbf -> wmj
+r43 XOR nbf -> z44 # z
+============== 45 ================
+nkv _OR wmj -> z45 # z
+==================================
+kmw AND gdq -> crq
+hjc _OR kpd -> mjq
+rhf AND cvh -> ntn
+bbw _OR cht -> vdg
+qdp AND sdc -> njb
+nwb _OR mhg -> cnh
+mtm _OR jmm -> wgw
+pfs _OR crq -> kmg
+fjq AND rhn -> cht
+pqd _OR rsb -> qqj
+ckj AND wvk -> jwh
+tpn _OR tdf -> npt
+hdr _OR ngh -> jkk
+kjs _OR rds -> nfd
+hfw _OR jfh -> dbp
+csp AND jkk -> kjs
+ppk AND qcs -> hjc
+vdg AND wrh -> qgr
+jwh _OR mnt -> cvh
+hnk AND cnh -> pqd
+mck _OR tbh -> cqf
+nfd AND pvq -> dvp
+fjp _OR fdv -> vfj
+njs _OR hgs -> vgk
+khg AND vgk -> tbh
+sjc _OR dvp -> qdp
+qhs AND mjq -> hfw
+ntn _OR jgh -> qcs
+wjn AND cqf -> fdv
+qwq _OR cjj -> ckj
+qgr _OR qrk -> pwv
+jpn _OR fnw -> rhn
+dbp AND dpt -> tdf
+jpf AND qqj -> jmm
+bsn _OR cwh -> bvk
+bvk AND whw -> hgs
+vfj AND rhc -> hdr
+brt AND npt -> jpn
+sps AND fqr -> cwh
